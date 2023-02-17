@@ -11,6 +11,5 @@ namespace HotelBooking.Model.Entities
         public string ServiceName { get; set; }
         public double ServicePrice { get; set; }
         public ICollection<RoomService> RoomServices { get; set; }
-        public virtual Room Room { get; set; }
     }
 }
