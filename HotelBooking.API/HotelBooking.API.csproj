@@ -7,11 +7,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Interfaces\**" />
+    <Content Remove="Interfaces\**" />
+    <EmbeddedResource Remove="Interfaces\**" />
+    <None Remove="Interfaces\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Interfaces\" />
+    <ProjectReference Include="..\HotelBooking.Common\HotelBooking.Common.csproj" />
+    <ProjectReference Include="..\HotelBooking.Data\HotelBooking.Data.csproj" />
+    <ProjectReference Include="..\HotelBooking.Model\HotelBooking.Model.csproj" />
+    <ProjectReference Include="..\HotelBooking.Service\HotelBooking.Service.csproj" />
   </ItemGroup>
 
 </Project>

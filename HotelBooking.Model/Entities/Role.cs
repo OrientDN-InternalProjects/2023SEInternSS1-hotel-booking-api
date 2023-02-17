@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNet.Identity.EntityFramework;
+﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations;
 
 namespace HotelBooking.Model.Entities
 {
