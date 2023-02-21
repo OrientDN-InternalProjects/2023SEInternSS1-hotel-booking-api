@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using HotelBooking.Data.DTOs;
 using HotelBooking.Data.Infrastructure;
 using HotelBooking.Data.Interfaces;
@@ -20,9 +14,9 @@ namespace HotelBooking.Service.Services
         private readonly IUnitOfWork unitOfWork;
         public AddressService(IAddressRepository addressRepository, IMapper mapper, IUnitOfWork unitOfWork)
         {
-            this.addressRepository= addressRepository;
+            this.addressRepository = addressRepository;
             this.mapper = mapper;
-            this.unitOfWork= unitOfWork;
+            this.unitOfWork = unitOfWork;
         }
         public async Task<Guid> AddAsync(CreateAddressDTO model)
         {
@@ -35,24 +29,24 @@ namespace HotelBooking.Service.Services
 
         public async Task<bool> DeleteAsync(Guid id)
         {
-           var address = addressRepository.GetByID(id);
-           if(address == null || address.IsDeleted == true)
-           {
+            var address = addressRepository.GetByID(id);
+            if (address == null || address.IsDeleted == true)
+            {
                 return false;
-           }
-           address.IsDeleted= true; 
-           address.DeletedDate = DateTime.Now;
-           await unitOfWork.SaveAsync();
-           return true;    
+            }
+            address.IsDeleted = true;
+            address.DeletedDate = DateTime.Now;
+            await unitOfWork.SaveAsync();
+            return true;
         }
 
         public async Task<IEnumerable<Address>> GetAllAsync()
         {
             var result = new List<Address>();
-            var objects = await addressRepository.GetAllAddressesAsync();
-            foreach(var i in objects)
+            var objects = await addressRepository.GetAllAsync();
+            foreach (var i in objects)
             {
-                if(i.IsDeleted == false)
+                if (i.IsDeleted == false)
                 {
                     result.Add(i);
                 }
@@ -60,22 +54,22 @@ namespace HotelBooking.Service.Services
             return result;
         }
 
-        public async Task<Address?> GetByIdAsync(Guid id)
+        public async Task<Address> GetByIdAsync(Guid id)
         {
-            var result = await addressRepository.GetAddressByIdAsync(id);
+            var result = await addressRepository.GetByIdAsync(id);
             return result;
         }
 
         public async Task<bool> UpdateAsync(UpdateAddressDTO model)
         {
-            var result = await addressRepository.GetAddressByIdAsync(model.Id);
+            var result = await addressRepository.GetByIdAsync(model.Id);
             if (result == null)
             {
                 return false;
             }
-            var addressResult = mapper.Map(model,result);
+            var addressResult = mapper.Map(model, result);
             result.UpdatedDate = DateTime.Now;
-            addressRepository.UpdateAddress(result);
+            addressRepository.UpdateAsync(result);
             await unitOfWork.SaveAsync();
             return true;
         }

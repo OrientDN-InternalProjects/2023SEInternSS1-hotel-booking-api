@@ -10,27 +10,27 @@ namespace HotelBooking.Data.Repository
         public AddressRepository(BookingDbContext context) : base(context)
         {
         }
-        public void CreateAddress(Address address)
+        public void CreateAsync(Address address)
         {
             Add(address);
         }
 
-        public void DeleteAddress(Address address)
+        public void DeleteAsync(Address address)
         {
             Delete(address);
         }
 
-        public async Task<Address?> GetAddressByIdAsync(Guid addressId)
+        public async Task<Address> GetByIdAsync(Guid addressId)
         {
             return await GetByCondition(address => address.Id.Equals(addressId) && address.IsDeleted == false).FirstOrDefaultAsync();
-            
-        } 
-        public async Task<IEnumerable<Address>> GetAllAddressesAsync()
+
+        }
+        public async Task<IEnumerable<Address>> GetAllAsync()
         {
             return await GetAll().OrderBy(address => address.Id).ToListAsync();
         }
 
-        public void UpdateAddress(Address address)
+        public void UpdateAsync(Address address)
         {
             Update(address);
         }
