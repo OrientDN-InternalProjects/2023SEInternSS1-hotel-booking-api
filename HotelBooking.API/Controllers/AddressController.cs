@@ -1,7 +1,5 @@
 ﻿using HotelBooking.Data.DTOs;
 using HotelBooking.Service.IServices;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HotelBooking.API.Controllers
@@ -12,16 +10,16 @@ namespace HotelBooking.API.Controllers
     {
         private readonly IAddressService addressService;
         private readonly ILogger<AddressController> logger;
-        public AddressController(IAddressService addressService,ILogger<AddressController> logger)
+        public AddressController(IAddressService addressService, ILogger<AddressController> logger)
         {
-            this.addressService =  addressService;
+            this.addressService = addressService;
             this.logger = logger;
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateAddressAsync([FromForm] CreateAddressDTO model)
         {
-            if (model== null)
+            if (model == null)
             {
                 logger.LogError("Invalid model sent from client.");
                 return BadRequest("Hic! Invalid model object");

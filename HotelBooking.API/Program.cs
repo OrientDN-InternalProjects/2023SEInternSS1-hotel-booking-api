@@ -2,7 +2,6 @@ using HotelBooking.Data;
 using HotelBooking.Data.Infrastructure;
 using HotelBooking.Data.Interfaces;
 using HotelBooking.Data.Repository;
-using HotelBooking.Model.Entities;
 using HotelBooking.Service.IServices;
 using HotelBooking.Service.Services;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +19,8 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 builder.Services.AddScoped<IAddressService, AddressService>();
+builder.Services.AddScoped<IServiceHotel, ServiceHotel>();
+builder.Services.AddScoped<IServiceHotelRepository, ServiceHotelRepository>();
 
 var connectionString = builder.Configuration.GetConnectionString("Default");
 builder.Services.AddDbContext<BookingDbContext>(options =>
