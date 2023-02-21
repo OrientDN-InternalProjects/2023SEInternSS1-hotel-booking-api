@@ -11,6 +11,6 @@ namespace HotelBooking.Model.Entities
         public virtual Room Room { get; set; }
         public Guid? ServiceId { get; set; }
         [ForeignKey("ServiceId")]
-        public virtual Service Service { get; set; }
+        public virtual ExtraService Service { get; set; }
     }
 }

@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace HotelBooking.Model.Entities
 {
     [Table("FBH_Service")]
-    public class Service : BaseEntity
+    public class ExtraService : BaseEntity
     {
         [StringLength(250)]
         public string ServiceName { get; set; }
