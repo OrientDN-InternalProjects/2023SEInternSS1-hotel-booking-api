@@ -1,6 +1,5 @@
 ﻿using HotelBooking.Data.DTOs;
 using HotelBooking.Service.IServices;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HotelBooking.API.Controllers
@@ -18,7 +17,7 @@ namespace HotelBooking.API.Controllers
             this.logger = logger;
         }
 
-        [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+        //[Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
         [HttpPost]
         public async Task<IActionResult> CreateAddressAsync([FromForm] CreateAddressDTO model)
         {
@@ -30,7 +29,7 @@ namespace HotelBooking.API.Controllers
             return Ok(await addressService.AddAsync(model));
         }
 
-        [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+        //[Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
         [HttpGet]
         public async Task<IActionResult> GetAllAddressAsync()
         {
@@ -38,7 +37,7 @@ namespace HotelBooking.API.Controllers
             return Ok(await addressService.GetAllAsync());
         }
 
-        [Authorize(AuthenticationSchemes = "Bearer")]
+        //[Authorize(AuthenticationSchemes = "Bearer")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAddressByIdAsync(Guid id)
         {
@@ -48,7 +47,7 @@ namespace HotelBooking.API.Controllers
             return Ok(res);
         }
 
-        [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+        //[Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateAddress([FromForm] UpdateAddressDTO model)
         {
@@ -60,7 +59,7 @@ namespace HotelBooking.API.Controllers
             return Ok(await addressService.UpdateAsync(model));
         }
 
-        [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+        //[Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAdress(Guid id)
         {

@@ -22,14 +22,14 @@ namespace HotelBooking.Service.Services
         {
             var address = mapper.Map<Address>(model);
             address.CreatedDate = DateTime.Now;
-            addressRepository.Add(address);
+            addressRepository.CreateAsync(address);
             await unitOfWork.SaveAsync();
             return address.Id;
         }
 
         public async Task<bool> DeleteAsync(Guid id)
         {
-            var address = addressRepository.GetByID(id);
+            var address = await addressRepository.GetByIdAsync(id);
             if (address == null || address.IsDeleted == true)
             {
                 return false;
