@@ -5,10 +5,10 @@ namespace HotelBooking.Data.Interfaces
 {
     public interface IAddressRepository : IGenericRepository<Address>
     {
-        Task<IEnumerable<Address>> GetAllAddressesAsync();
-        Task<Address?> GetAddressByIdAsync(Guid addressId);
-        void CreateAddress(Address address);
-        void UpdateAddress(Address address);
-        void DeleteAddress(Address address);
+        Task<IEnumerable<Address>> GetAllAsync();
+        Task<Address> GetByIdAsync(Guid addressId);
+        void CreateAsync(Address address);
+        void UpdateAsync(Address address);
+        void DeleteAsync(Address address);
     }
 }

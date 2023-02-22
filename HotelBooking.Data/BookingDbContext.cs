@@ -1,9 +1,10 @@
 ﻿using HotelBooking.Model.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace HotelBooking.Data
 {
-    public class BookingDbContext : DbContext
+    public class BookingDbContext : IdentityDbContext<User>
     {
         public BookingDbContext(DbContextOptions options) : base(options)
         {
