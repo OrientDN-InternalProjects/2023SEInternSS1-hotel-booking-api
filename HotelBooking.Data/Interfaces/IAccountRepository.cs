@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using HotelBooking.Data.Authenication;
+﻿using HotelBooking.Data.Authenication;
 using HotelBooking.Data.DTOs.Account;
-using Microsoft.AspNetCore.Identity;
 
 namespace HotelBooking.Data.Interfaces
 {
@@ -13,5 +7,8 @@ namespace HotelBooking.Data.Interfaces
     {
         Task<AuthenicationModel> RegisterAsync(RegisterDTO model);
         Task<AuthenicationModel> LoginAsync(LoginDTO model);
+        Task<AuthenicationModel> ForgetPassword(ForgetPasswordDTO model);
+        Task<AuthenicationModel> ResetPassword(ResetPasswordDTO model);
+        Task<AuthenicationModel> ChangePassword(string email, ChangePasswordDTO model);
     }
 }
