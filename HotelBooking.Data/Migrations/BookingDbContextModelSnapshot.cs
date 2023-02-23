@@ -160,6 +160,36 @@ namespace HotelBooking.Data.Migrations
                     b.ToTable("FBH_Duration");
                 });
 
+            modelBuilder.Entity("HotelBooking.Model.Entities.ExtraService", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ServiceName")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<double>("ServicePrice")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FBH_Service");
+                });
+
             modelBuilder.Entity("HotelBooking.Model.Entities.Facility", b =>
                 {
                     b.Property<Guid>("Id")
@@ -437,36 +467,6 @@ namespace HotelBooking.Data.Migrations
                     b.HasIndex("ServiceId");
 
                     b.ToTable("FBH_Room_Service");
-                });
-
-            modelBuilder.Entity("HotelBooking.Model.Entities.Service", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ServiceName")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<double>("ServicePrice")
-                        .HasColumnType("float");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("FBH_Service");
                 });
 
             modelBuilder.Entity("HotelBooking.Model.Entities.User", b =>
@@ -780,7 +780,7 @@ namespace HotelBooking.Data.Migrations
                         .WithMany("RoomServices")
                         .HasForeignKey("RoomId");
 
-                    b.HasOne("HotelBooking.Model.Entities.Service", "Service")
+                    b.HasOne("HotelBooking.Model.Entities.ExtraService", "Service")
                         .WithMany("RoomServices")
                         .HasForeignKey("ServiceId");
 
@@ -860,6 +860,11 @@ namespace HotelBooking.Data.Migrations
                     b.Navigation("Booking");
                 });
 
+            modelBuilder.Entity("HotelBooking.Model.Entities.ExtraService", b =>
+                {
+                    b.Navigation("RoomServices");
+                });
+
             modelBuilder.Entity("HotelBooking.Model.Entities.Facility", b =>
                 {
                     b.Navigation("RoomFacilities");
@@ -883,11 +888,6 @@ namespace HotelBooking.Data.Migrations
 
                     b.Navigation("RoomFacilities");
 
-                    b.Navigation("RoomServices");
-                });
-
-            modelBuilder.Entity("HotelBooking.Model.Entities.Service", b =>
-                {
                     b.Navigation("RoomServices");
                 });
 #pragma warning restore 612, 618
