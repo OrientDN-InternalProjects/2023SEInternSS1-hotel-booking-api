@@ -4,6 +4,7 @@ using HotelBooking.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HotelBooking.Data.Migrations
 {
     [DbContext(typeof(BookingDbContext))]
-    partial class BookingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230225042645_Init")]
+    partial class Init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -251,7 +254,9 @@ namespace HotelBooking.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AddressId");
+                    b.HasIndex("AddressId")
+                        .IsUnique()
+                        .HasFilter("[AddressId] IS NOT NULL");
 
                     b.ToTable("FHB_Hotel");
                 });
@@ -361,7 +366,9 @@ namespace HotelBooking.Data.Migrations
 
                     b.HasIndex("HotelId");
 
-                    b.HasIndex("PriceId");
+                    b.HasIndex("PriceId")
+                        .IsUnique()
+                        .HasFilter("[PriceId] IS NOT NULL");
 
                     b.ToTable("FHB_Room");
                 });
@@ -704,8 +711,8 @@ namespace HotelBooking.Data.Migrations
             modelBuilder.Entity("HotelBooking.Model.Entities.Hotel", b =>
                 {
                     b.HasOne("HotelBooking.Model.Entities.Address", "Address")
-                        .WithMany()
-                        .HasForeignKey("AddressId");
+                        .WithOne("Hotel")
+                        .HasForeignKey("HotelBooking.Model.Entities.Hotel", "AddressId");
 
                     b.Navigation("Address");
                 });
@@ -730,8 +737,8 @@ namespace HotelBooking.Data.Migrations
                         .HasForeignKey("HotelId");
 
                     b.HasOne("HotelBooking.Model.Entities.PriceQuotation", "Price")
-                        .WithMany()
-                        .HasForeignKey("PriceId");
+                        .WithOne("Room")
+                        .HasForeignKey("HotelBooking.Model.Entities.Room", "PriceId");
 
                     b.Navigation("Booking");
 
@@ -836,6 +843,11 @@ namespace HotelBooking.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("HotelBooking.Model.Entities.Address", b =>
+                {
+                    b.Navigation("Hotel");
+                });
+
             modelBuilder.Entity("HotelBooking.Model.Entities.Booking", b =>
                 {
                     b.Navigation("Rooms");
@@ -866,6 +878,11 @@ namespace HotelBooking.Data.Migrations
                     b.Navigation("Rooms");
 
                     b.Navigation("Urls");
+                });
+
+            modelBuilder.Entity("HotelBooking.Model.Entities.PriceQuotation", b =>
+                {
+                    b.Navigation("Room");
                 });
 
             modelBuilder.Entity("HotelBooking.Model.Entities.Room", b =>

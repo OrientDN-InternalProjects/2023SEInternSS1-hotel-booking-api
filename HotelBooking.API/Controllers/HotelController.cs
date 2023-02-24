@@ -1,5 +1,6 @@
-﻿using HotelBooking.Data.DTOs;
+﻿using HotelBooking.Data.DTOs.Hotel;
 using HotelBooking.Service.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HotelBooking.API.Controllers
@@ -17,7 +18,8 @@ namespace HotelBooking.API.Controllers
             this.logger = logger;
         }
 
-        [HttpPost]
+        [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+        [HttpPost("create-hotel")]
         public async Task<IActionResult> CreateHotelAsync([FromForm] CreateHotelDTO model)
         {
             if (model == null)
@@ -25,41 +27,55 @@ namespace HotelBooking.API.Controllers
                 logger.LogError("Invalid model sent from client.");
                 return BadRequest("Invalid model object");
             }
-            return Ok(await hotelService.AddAsync(model));
+            return Ok(await hotelService.AddHotelAsync(model));
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAllHotelsAsync()
-        {
-            logger.LogInformation("Get All Hotels");
-            return Ok(await hotelService.GetAllAsync());
-        }
-
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetHotelByIdAsync(Guid id)
-        {
-            logger.LogInformation($"Get address with Id {id}");
-            var res = await hotelService.GetByIdAsync(id);
-            if (res == null) return NotFound();
-            return Ok(res);
-        }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateHotel([FromForm] UpdateHotelDTO model)
+        [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+        [HttpPost("create-room")]
+        public async Task<IActionResult> CreateRoomAsync([FromForm] CreateRoomDTO model)
         {
             if (model == null)
             {
                 logger.LogError("Invalid model sent from client.");
                 return BadRequest("Invalid model object");
             }
-            return Ok(await hotelService.UpdateAsync(model));
+            return Ok(await hotelService.AddRoomAsync(model));
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteHotel(Guid id)
+        [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+        [HttpPost("create-facility")]
+        public async Task<IActionResult> CreateFacilityAsync([FromForm] CreateFacilityDTO model)
         {
-            return Ok(await hotelService.DeleteAsync(id));
+            if (model == null)
+            {
+                logger.LogError("Invalid model sent from client.");
+                return BadRequest("Invalid model object");
+            }
+            return Ok(await hotelService.AddFacilityAsync(model));
         }
 
+        [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+        [HttpPost("create-service")]
+        public async Task<IActionResult> CreateServiceAsync([FromForm] CreateServiceHotelDTO model)
+        {
+            if (model == null)
+            {
+                logger.LogError("Invalid model sent from client.");
+                return BadRequest("Invalid model object");
+            }
+            return Ok(await hotelService.AddExtraServiceAsync(model));
+        }
+
+        [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+        [HttpPost("equip-room")]
+        public async Task<IActionResult> EquipRoomAsync([FromForm] EquipRoomDTO model)
+        {
+            if (model == null)
+            {
+                logger.LogError("Invalid model sent from client.");
+                return BadRequest("Invalid model object");
+            }
+            return Ok(await hotelService.AddServiceAndFacilityToRoomAsync(model));
+        }
     }
 }

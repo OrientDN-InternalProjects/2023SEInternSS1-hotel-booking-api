@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HotelBooking.Data.Migrations
 {
     [DbContext(typeof(BookingDbContext))]
-    [Migration("20230223055027_Init")]
-    partial class Init
+    [Migration("20230225113530_ChangeAddressTable")]
+    partial class ChangeAddressTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -254,9 +254,7 @@ namespace HotelBooking.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AddressId")
-                        .IsUnique()
-                        .HasFilter("[AddressId] IS NOT NULL");
+                    b.HasIndex("AddressId");
 
                     b.ToTable("FHB_Hotel");
                 });
@@ -711,8 +709,8 @@ namespace HotelBooking.Data.Migrations
             modelBuilder.Entity("HotelBooking.Model.Entities.Hotel", b =>
                 {
                     b.HasOne("HotelBooking.Model.Entities.Address", "Address")
-                        .WithOne("Hotel")
-                        .HasForeignKey("HotelBooking.Model.Entities.Hotel", "AddressId");
+                        .WithMany()
+                        .HasForeignKey("AddressId");
 
                     b.Navigation("Address");
                 });
@@ -841,11 +839,6 @@ namespace HotelBooking.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("HotelBooking.Model.Entities.Address", b =>
-                {
-                    b.Navigation("Hotel");
                 });
 
             modelBuilder.Entity("HotelBooking.Model.Entities.Booking", b =>

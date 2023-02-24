@@ -23,7 +23,7 @@ namespace HotelBooking.Data.Repository
 
         public async Task<IEnumerable<ExtraService>> GetAllAsync()
         {
-            return await GetAll().OrderBy(s => s.Id).ToListAsync();
+            return await GetAll().OrderBy(s => s.Id).Where(s => s.IsDeleted == false).ToListAsync();
         }
 
         public async Task<ExtraService> GetByIdAsync(Guid ServiceHotelId)
