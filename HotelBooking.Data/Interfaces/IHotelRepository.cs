@@ -1,4 +1,5 @@
-﻿using HotelBooking.Model.Entities;
+﻿using HotelBooking.Data.ViewModel;
+using HotelBooking.Model.Entities;
 
 namespace HotelBooking.Data.Interfaces
 {
@@ -9,5 +10,6 @@ namespace HotelBooking.Data.Interfaces
         void CreateAsync(Hotel hotel);
         void UpdateAsync(Hotel hotel);
         void DeleteAsync(Hotel hotel);
+        Task<IEnumerable<HotelVM>> GetByNameAync(string name);
     }
 }

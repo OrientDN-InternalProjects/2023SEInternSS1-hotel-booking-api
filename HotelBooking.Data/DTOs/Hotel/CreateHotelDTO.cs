@@ -1,6 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
 
-namespace HotelBooking.Data.DTOs
+namespace HotelBooking.Data.DTOs.Hotel
 {
     public class CreateHotelDTO
     {
@@ -9,6 +10,7 @@ namespace HotelBooking.Data.DTOs
         public double? Rating { get; set; }
         [StringLength(250)]
         public string Description { get; set; }
-        public Guid AddressId { get; set; }
+        public CreateAddressDTO Address { get; set; }
+        public IEnumerable<IFormFile> Images { get; set; }
     }
 }

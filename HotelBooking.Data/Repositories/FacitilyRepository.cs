@@ -24,7 +24,7 @@ namespace HotelBooking.Data.Repository
 
         public async Task<IEnumerable<Facility>> GetAllFacilityAsync()
         {
-            return await GetAll().OrderBy(Facility => Facility.Id).ToListAsync();
+            return await GetAll().OrderBy(Facility => Facility.Id).Where(x => x.IsDeleted == false).ToListAsync();
         }
 
         public async Task<Facility> GetFacilityByIdAsync(Guid FacilityId)

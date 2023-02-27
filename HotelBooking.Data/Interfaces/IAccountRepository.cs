@@ -1,5 +1,5 @@
-﻿using HotelBooking.Data.Authenication;
-using HotelBooking.Data.DTOs.Account;
+﻿using HotelBooking.Data.DTOs.Account;
+using HotelBooking.Data.ViewModel;
 
 namespace HotelBooking.Data.Interfaces
 {

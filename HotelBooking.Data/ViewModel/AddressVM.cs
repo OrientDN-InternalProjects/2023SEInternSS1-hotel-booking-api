@@ -1,11 +1,8 @@
-﻿using HotelBooking.Common.Base;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace HotelBooking.Model.Entities
+namespace HotelBooking.Data.ViewModel
 {
-    [Table("FHB_Address")]
-    public class Address : BaseEntity
+    public class AddressVM
     {
         [StringLength(250)]
         public string City { get; set; }

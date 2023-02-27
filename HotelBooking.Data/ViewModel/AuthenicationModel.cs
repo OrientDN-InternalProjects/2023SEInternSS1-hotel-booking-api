@@ -1,4 +1,4 @@
-﻿namespace HotelBooking.Data.Authenication
+﻿namespace HotelBooking.Data.ViewModel
 {
     public class AuthenicationModel
     {

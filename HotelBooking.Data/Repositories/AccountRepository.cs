@@ -1,8 +1,8 @@
 ﻿using HotelBooking.Common.Constants;
-using HotelBooking.Data.Authenication;
 using HotelBooking.Data.DTOs.Account;
 using HotelBooking.Data.Extensions;
 using HotelBooking.Data.Interfaces;
+using HotelBooking.Data.ViewModel;
 using HotelBooking.Model.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -46,7 +46,7 @@ namespace HotelBooking.Data.Repositories
                 result.IsSuccess = true;
                 return result;
             }
-            result.Message = "Register failed";
+            result.Message = "Change-password failed";
             List<IdentityError> errors = res.Errors.ToList();
             result.Error = string.Join(", ", errors.Select(e => e.Description));
             result.IsSuccess = false;
@@ -155,7 +155,7 @@ namespace HotelBooking.Data.Repositories
                 result.IsSuccess = true;
                 return result;
             }
-            result.Message = "Register failed";
+            result.Message = "reset-password failed";
             List<IdentityError> errors = resetResult.Errors.ToList();
             result.Error = string.Join(", ", errors.Select(e => e.Description));
             result.IsSuccess = false;
