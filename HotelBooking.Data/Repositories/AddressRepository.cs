@@ -14,11 +14,7 @@ namespace HotelBooking.Data.Repository
         {
             Add(address);
         }
-        public bool CreateTest(Address address)
-        {
-            Add(address);
-            return true;
-        }
+     
         public void DeleteAsync(Address address)
         {
             Delete(address);

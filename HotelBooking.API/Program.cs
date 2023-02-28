@@ -119,6 +119,9 @@ builder.Services.AddScoped<IRoomFacility, RoomFacilityRepository>();
 builder.Services.AddScoped<IServiceHotelRepository, ServiceHotelRepository>();
 builder.Services.AddScoped<IFacilityRepository, FacilityRepository>();
 builder.Services.AddScoped<IBookingService, BookingService>();
+builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+builder.Services.AddScoped<IBookedRoom,IBookedRoomRepository>();
+
 var connectionString = builder.Configuration.GetConnectionString("Default");
 builder.Services.AddDbContext<BookingDbContext>(options =>
     options.UseSqlServer(connectionString));

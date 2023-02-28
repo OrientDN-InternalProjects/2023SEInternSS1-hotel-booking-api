@@ -8,9 +8,8 @@ namespace HotelBooking.Model.Entities
     {
         public double? Amount { get; set; }
         public bool? PaymentStatus { get; set; }
-        public Guid? DurationId { get; set; }
-        [ForeignKey("DurationId")]
-        public virtual Duration Duration { get; set; }
-        public virtual ICollection<Room> Rooms { get; set; }
+        public virtual ICollection<BookedRoom> BookedRooms { get; set; }
+        public DateTime From { get; set; }
+        public DateTime To { get; set; }
     }
 }
