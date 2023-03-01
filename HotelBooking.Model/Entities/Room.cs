@@ -9,7 +9,6 @@ namespace HotelBooking.Model.Entities
     public class Room : BaseEntity
     {
         public RoomType? RoomType { get; set; }
-        public RoomStatus? RoomStatus { get; set; }
         [StringLength(500)]
         public string Description { get; set; }
         public Guid? HotelId { get; set; }
@@ -23,6 +22,6 @@ namespace HotelBooking.Model.Entities
         public virtual PriceQuotation Price { get; set; }
         public virtual ICollection<RoomService> RoomServices { get; set; }
         public virtual ICollection<RoomFacility> RoomFacilities { get; set; }
-        public virtual ICollection<RoomDiscount> RoomDiscounts { get; set; }
+        public virtual ICollection<BookedRoom> BookedRooms { get; set;}
     }
 }

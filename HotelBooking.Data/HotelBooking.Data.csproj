@@ -29,4 +29,8 @@
     <ProjectReference Include="..\HotelBooking.Model\HotelBooking.Model.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DTOs\Booking\" />
+  </ItemGroup>
+
 </Project>

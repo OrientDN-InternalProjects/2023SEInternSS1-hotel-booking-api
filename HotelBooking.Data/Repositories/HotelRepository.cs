@@ -54,9 +54,8 @@ namespace HotelBooking.Data.Repositories
                     PinCode = x.Address.PinCode
                 },
                 Urls = x.Urls.Select(x => x.ImageUrl).ToList(),
-                Rooms = x.Rooms.Where(x => x.RoomStatus == Common.Enums.RoomStatus.EMPTY).Select(x => new RoomVM
+                Rooms = x.Rooms.Select(x => new RoomVM
                 {
-                    RoomStatus = x.RoomStatus,
                     RoomType = x.RoomType,
                     Description = x.Description,
                     ExtraServices = x.RoomServices.Select(x => new ServiceVM

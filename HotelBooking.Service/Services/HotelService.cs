@@ -84,7 +84,6 @@ namespace HotelBooking.Service.Services
             priceQuotationRepository.CreatePriceQuotation(priceQuotation);
             var room = mapper.Map<Room>(model);
             room.CreatedDate = DateTime.Now;
-            room.RoomStatus = RoomStatus.EMPTY;
             roomRepository.CreateAsync(room);
             await unitOfWork.SaveAsync();
             return room.Id;
