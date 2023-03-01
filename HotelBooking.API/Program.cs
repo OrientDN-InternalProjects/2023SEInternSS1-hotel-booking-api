@@ -57,6 +57,9 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddTransient<TokenManagerMiddleware>();
+builder.Services.AddScoped<ITokenManager,TokenManager>();
+
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // Add Indentity
@@ -139,6 +142,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
+app.UseMiddleware<TokenManagerMiddleware>();
 
 app.UseAuthorization();
 

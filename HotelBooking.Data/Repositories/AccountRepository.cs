@@ -20,13 +20,18 @@ namespace HotelBooking.Data.Repositories
         private readonly IConfiguration configuration;
         private readonly BookingDbContext context;
         private readonly IMailSender mailSender;
-        public AccountRepository(UserManager<User> userManager, SignInManager<User> signInManager, IConfiguration configuration, BookingDbContext context, IMailSender mailSender)
+        private readonly ITokenManager tokenManager;
+        public AccountRepository(UserManager<User> userManager, 
+            SignInManager<User> signInManager, 
+            IConfiguration configuration, BookingDbContext context, 
+            IMailSender mailSender, ITokenManager tokenManager)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.configuration = configuration;
             this.context = context;
             this.mailSender = mailSender;
+            this.tokenManager = tokenManager;
         }
 
         public async Task<AuthenicationModel> ChangePassword(string email, ChangePasswordDTO model)
@@ -42,6 +47,9 @@ namespace HotelBooking.Data.Repositories
             var res = await userManager.ChangePasswordAsync(exist_user, model.OldPassword, model.NewPassword);
             if (res.Succeeded)
             {
+                await tokenManager.DeactivateCurrentAsync();
+                JwtSecurityToken jwtSecurityToken = await CreateJwtToken(exist_user);
+                result.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
                 result.Message = "Congrats! Change password successfully!";
                 result.IsSuccess = true;
                 return result;
