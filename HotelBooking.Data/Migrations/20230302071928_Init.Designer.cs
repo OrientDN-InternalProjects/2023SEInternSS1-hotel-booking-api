@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HotelBooking.Data.Migrations
 {
     [DbContext(typeof(BookingDbContext))]
-    [Migration("20230225113530_ChangeAddressTable")]
-    partial class ChangeAddressTable
+    [Migration("20230302071928_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -68,76 +68,13 @@ namespace HotelBooking.Data.Migrations
                     b.ToTable("FHB_Address");
                 });
 
-            modelBuilder.Entity("HotelBooking.Model.Entities.Booking", b =>
+            modelBuilder.Entity("HotelBooking.Model.Entities.BookedRoom", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<double?>("Amount")
-                        .HasColumnType("float");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DurationId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("PaymentStatus")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DurationId")
-                        .IsUnique()
-                        .HasFilter("[DurationId] IS NOT NULL");
-
-                    b.ToTable("FHB_Booking");
-                });
-
-            modelBuilder.Entity("HotelBooking.Model.Entities.Discount", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DiscountName")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<double>("Percent")
-                        .HasColumnType("float");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("FHB_Discount");
-                });
-
-            modelBuilder.Entity("HotelBooking.Model.Entities.Duration", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<Guid?>("BookingId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("CreatedDate")
@@ -152,6 +89,9 @@ namespace HotelBooking.Data.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<Guid?>("RoomId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("To")
                         .HasColumnType("datetime2");
 
@@ -160,7 +100,52 @@ namespace HotelBooking.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("FBH_Duration");
+                    b.HasIndex("BookingId");
+
+                    b.HasIndex("RoomId");
+
+                    b.ToTable("FHB_BookedRoom");
+                });
+
+            modelBuilder.Entity("HotelBooking.Model.Entities.Booking", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<double>("Amount")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("From")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("PaymentStatus")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("To")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FHB_Booking");
                 });
 
             modelBuilder.Entity("HotelBooking.Model.Entities.ExtraService", b =>
@@ -349,9 +334,6 @@ namespace HotelBooking.Data.Migrations
                     b.Property<Guid?>("PriceId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("RoomStatus")
-                        .HasColumnType("int");
-
                     b.Property<int?>("RoomType")
                         .HasColumnType("int");
 
@@ -364,44 +346,9 @@ namespace HotelBooking.Data.Migrations
 
                     b.HasIndex("HotelId");
 
-                    b.HasIndex("PriceId")
-                        .IsUnique()
-                        .HasFilter("[PriceId] IS NOT NULL");
+                    b.HasIndex("PriceId");
 
                     b.ToTable("FHB_Room");
-                });
-
-            modelBuilder.Entity("HotelBooking.Model.Entities.RoomDiscount", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DiscountId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid?>("RoomId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DiscountId");
-
-                    b.HasIndex("RoomId");
-
-                    b.ToTable("FHB_Room_Discount");
                 });
 
             modelBuilder.Entity("HotelBooking.Model.Entities.RoomFacility", b =>
@@ -697,13 +644,19 @@ namespace HotelBooking.Data.Migrations
                     b.HasDiscriminator().HasValue("Role");
                 });
 
-            modelBuilder.Entity("HotelBooking.Model.Entities.Booking", b =>
+            modelBuilder.Entity("HotelBooking.Model.Entities.BookedRoom", b =>
                 {
-                    b.HasOne("HotelBooking.Model.Entities.Duration", "Duration")
-                        .WithOne("Booking")
-                        .HasForeignKey("HotelBooking.Model.Entities.Booking", "DurationId");
+                    b.HasOne("HotelBooking.Model.Entities.Booking", "Booking")
+                        .WithMany("BookedRooms")
+                        .HasForeignKey("BookingId");
 
-                    b.Navigation("Duration");
+                    b.HasOne("HotelBooking.Model.Entities.Room", "Room")
+                        .WithMany("BookedRooms")
+                        .HasForeignKey("RoomId");
+
+                    b.Navigation("Booking");
+
+                    b.Navigation("Room");
                 });
 
             modelBuilder.Entity("HotelBooking.Model.Entities.Hotel", b =>
@@ -727,7 +680,7 @@ namespace HotelBooking.Data.Migrations
             modelBuilder.Entity("HotelBooking.Model.Entities.Room", b =>
                 {
                     b.HasOne("HotelBooking.Model.Entities.Booking", "Booking")
-                        .WithMany("Rooms")
+                        .WithMany()
                         .HasForeignKey("BookingId");
 
                     b.HasOne("HotelBooking.Model.Entities.Hotel", "Hotel")
@@ -735,29 +688,14 @@ namespace HotelBooking.Data.Migrations
                         .HasForeignKey("HotelId");
 
                     b.HasOne("HotelBooking.Model.Entities.PriceQuotation", "Price")
-                        .WithOne("Room")
-                        .HasForeignKey("HotelBooking.Model.Entities.Room", "PriceId");
+                        .WithMany()
+                        .HasForeignKey("PriceId");
 
                     b.Navigation("Booking");
 
                     b.Navigation("Hotel");
 
                     b.Navigation("Price");
-                });
-
-            modelBuilder.Entity("HotelBooking.Model.Entities.RoomDiscount", b =>
-                {
-                    b.HasOne("HotelBooking.Model.Entities.Discount", "Discount")
-                        .WithMany("RoomDiscounts")
-                        .HasForeignKey("DiscountId");
-
-                    b.HasOne("HotelBooking.Model.Entities.Room", "Room")
-                        .WithMany("RoomDiscounts")
-                        .HasForeignKey("RoomId");
-
-                    b.Navigation("Discount");
-
-                    b.Navigation("Room");
                 });
 
             modelBuilder.Entity("HotelBooking.Model.Entities.RoomFacility", b =>
@@ -843,17 +781,7 @@ namespace HotelBooking.Data.Migrations
 
             modelBuilder.Entity("HotelBooking.Model.Entities.Booking", b =>
                 {
-                    b.Navigation("Rooms");
-                });
-
-            modelBuilder.Entity("HotelBooking.Model.Entities.Discount", b =>
-                {
-                    b.Navigation("RoomDiscounts");
-                });
-
-            modelBuilder.Entity("HotelBooking.Model.Entities.Duration", b =>
-                {
-                    b.Navigation("Booking");
+                    b.Navigation("BookedRooms");
                 });
 
             modelBuilder.Entity("HotelBooking.Model.Entities.ExtraService", b =>
@@ -873,14 +801,9 @@ namespace HotelBooking.Data.Migrations
                     b.Navigation("Urls");
                 });
 
-            modelBuilder.Entity("HotelBooking.Model.Entities.PriceQuotation", b =>
-                {
-                    b.Navigation("Room");
-                });
-
             modelBuilder.Entity("HotelBooking.Model.Entities.Room", b =>
                 {
-                    b.Navigation("RoomDiscounts");
+                    b.Navigation("BookedRooms");
 
                     b.Navigation("RoomFacilities");
 

@@ -5,7 +5,7 @@
 namespace HotelBooking.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class ChangePriceTable : Migration
+    public partial class AddRoomToPrice : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,7 +17,9 @@ namespace HotelBooking.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_FHB_Room_PriceId",
                 table: "FHB_Room",
-                column: "PriceId");
+                column: "PriceId",
+                unique: true,
+                filter: "[PriceId] IS NOT NULL");
         }
 
         /// <inheritdoc />
@@ -30,9 +32,7 @@ namespace HotelBooking.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_FHB_Room_PriceId",
                 table: "FHB_Room",
-                column: "PriceId",
-                unique: true,
-                filter: "[PriceId] IS NOT NULL");
+                column: "PriceId");
         }
     }
 }

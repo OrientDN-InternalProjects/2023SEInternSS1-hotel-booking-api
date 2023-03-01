@@ -7,7 +7,8 @@ namespace HotelBooking.Service.IServices
     {
         public Task<IEnumerable<HotelVM>> SearchHotelByName(string name);
         Task<bool> AddBookingAsync(BookingVM model);
-        Task<bool> CheckValidationDurationForRoom(DurationVM model, string roomId);
-
+        Task<bool> CheckValidationDurationForRoom(DurationVM model, Guid roomId);
+        Task<bool> UpdateBookingAsync(BookingVM model, Guid id);
+        Task<bool> DeleteBookingAsync(Guid id);
     }
 }

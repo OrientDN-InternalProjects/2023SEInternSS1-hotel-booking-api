@@ -56,23 +56,6 @@ namespace HotelBooking.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "FBH_Duration",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    From = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    To = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_FBH_Duration", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "FBH_Facility",
                 columns: table => new
                 {
@@ -126,12 +109,16 @@ namespace HotelBooking.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "FHB_Discount",
+                name: "FHB_Booking",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Percent = table.Column<double>(type: "float", nullable: false),
-                    DiscountName = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
+                    Amount = table.Column<double>(type: "float", nullable: false),
+                    PaymentStatus = table.Column<bool>(type: "bit", nullable: true),
+                    From = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    To = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -139,7 +126,7 @@ namespace HotelBooking.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_FHB_Discount", x => x.Id);
+                    table.PrimaryKey("PK_FHB_Booking", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -265,29 +252,6 @@ namespace HotelBooking.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "FHB_Booking",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Amount = table.Column<double>(type: "float", nullable: true),
-                    PaymentStatus = table.Column<bool>(type: "bit", nullable: true),
-                    DurationId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_FHB_Booking", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_FHB_Booking_FBH_Duration_DurationId",
-                        column: x => x.DurationId,
-                        principalTable: "FBH_Duration",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "FHB_Hotel",
                 columns: table => new
                 {
@@ -340,7 +304,6 @@ namespace HotelBooking.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     RoomType = table.Column<int>(type: "int", nullable: true),
-                    RoomStatus = table.Column<int>(type: "int", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     HotelId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     BookingId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -425,12 +388,14 @@ namespace HotelBooking.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "FHB_Room_Discount",
+                name: "FHB_BookedRoom",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     RoomId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    DiscountId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    BookingId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    From = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    To = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -438,14 +403,14 @@ namespace HotelBooking.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_FHB_Room_Discount", x => x.Id);
+                    table.PrimaryKey("PK_FHB_BookedRoom", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_FHB_Room_Discount_FHB_Discount_DiscountId",
-                        column: x => x.DiscountId,
-                        principalTable: "FHB_Discount",
+                        name: "FK_FHB_BookedRoom_FHB_Booking_BookingId",
+                        column: x => x.BookingId,
+                        principalTable: "FHB_Booking",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_FHB_Room_Discount_FHB_Room_RoomId",
+                        name: "FK_FHB_BookedRoom_FHB_Room_RoomId",
                         column: x => x.RoomId,
                         principalTable: "FHB_Room",
                         principalColumn: "Id");
@@ -511,18 +476,19 @@ namespace HotelBooking.Data.Migrations
                 column: "ServiceId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_FHB_Booking_DurationId",
-                table: "FHB_Booking",
-                column: "DurationId",
-                unique: true,
-                filter: "[DurationId] IS NOT NULL");
+                name: "IX_FHB_BookedRoom_BookingId",
+                table: "FHB_BookedRoom",
+                column: "BookingId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FHB_BookedRoom_RoomId",
+                table: "FHB_BookedRoom",
+                column: "RoomId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_FHB_Hotel_AddressId",
                 table: "FHB_Hotel",
-                column: "AddressId",
-                unique: true,
-                filter: "[AddressId] IS NOT NULL");
+                column: "AddressId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_FHB_Image_HotelId",
@@ -542,19 +508,7 @@ namespace HotelBooking.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_FHB_Room_PriceId",
                 table: "FHB_Room",
-                column: "PriceId",
-                unique: true,
-                filter: "[PriceId] IS NOT NULL");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_FHB_Room_Discount_DiscountId",
-                table: "FHB_Room_Discount",
-                column: "DiscountId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_FHB_Room_Discount_RoomId",
-                table: "FHB_Room_Discount",
-                column: "RoomId");
+                column: "PriceId");
         }
 
         /// <inheritdoc />
@@ -582,10 +536,10 @@ namespace HotelBooking.Data.Migrations
                 name: "FBH_Room_Service");
 
             migrationBuilder.DropTable(
-                name: "FHB_Image");
+                name: "FHB_BookedRoom");
 
             migrationBuilder.DropTable(
-                name: "FHB_Room_Discount");
+                name: "FHB_Image");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
@@ -600,9 +554,6 @@ namespace HotelBooking.Data.Migrations
                 name: "FBH_Service");
 
             migrationBuilder.DropTable(
-                name: "FHB_Discount");
-
-            migrationBuilder.DropTable(
                 name: "FHB_Room");
 
             migrationBuilder.DropTable(
@@ -613,9 +564,6 @@ namespace HotelBooking.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "FHB_PriceQuotation");
-
-            migrationBuilder.DropTable(
-                name: "FBH_Duration");
 
             migrationBuilder.DropTable(
                 name: "FHB_Address");

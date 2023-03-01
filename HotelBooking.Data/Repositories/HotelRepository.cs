@@ -73,44 +73,6 @@ namespace HotelBooking.Data.Repositories
 
             }).ToListAsync();
             return result;
-            //var listHotelVM = new List<HotelVM>();
-            //if (result != null)
-            //{
-
-            //    foreach (var i in result)
-            //    {
-            //        listHotelVM.Add(
-            //            new HotelVM
-            //            {
-            //                HotelName = i.HotelName,
-            //                Rating = i.Rating,
-            //                Description = i.Description,
-            //                Urls = i.Urls.Select(x => x.ImageUrl).ToList()
-            //            }
-            //            );
-            //    }
-
-            //}
-
-            //var result = await GetByCondition(x => x.HotelName.ToLower().Contains(name.ToLower()) && x.IsDeleted == false)
-            //            .Select(x => new HotelVM()
-            //            {
-            //                HotelName = x.HotelName,
-            //                Rating = x.Rating,
-            //                Description = x.Description,
-            //                Urls = x.Urls.Select(x=>x.ImageUrl).ToList(),
-            //                Rooms = new RoomVM
-            //                {
-            //                    iD
-            //                }
-            //            })
-            //            .ToListAsync();
-            //return listHotelVM;
-            //.Include(x => x.Rooms.Where(x => x.RoomStatus == RoomStatus.EMPTY).Select(y => new RoomVM
-            //{
-
-
-            //})).ToListAsync();
         }
 
         public void UpdateAsync(Hotel hotel)

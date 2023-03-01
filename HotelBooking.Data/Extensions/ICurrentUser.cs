@@ -4,5 +4,6 @@
     {
         string UserId { get; }
         string UserEmail { get; }
+        bool IsAuthenicated { get; }
     }
 }
