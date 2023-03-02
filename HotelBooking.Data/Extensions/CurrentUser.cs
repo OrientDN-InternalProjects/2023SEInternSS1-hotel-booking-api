@@ -13,5 +13,6 @@ namespace HotelBooking.Data.Extensions
         private HttpContext HttpContext => httpContextAccessor.HttpContext;
         public string UserId => HttpContext?.User?.FindFirstValue("Id");
         public string UserEmail => HttpContext?.User?.FindFirstValue("Email");
+        public bool IsAuthenicated => HttpContext?.User?.Identity?.IsAuthenticated ?? false;
     }
 }

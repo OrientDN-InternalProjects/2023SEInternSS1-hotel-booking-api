@@ -62,7 +62,6 @@ namespace HotelBooking.Data.Repositories
             }
             return true;
         }
-
         public void CreateAsync(BookedRoom model)
         {
             Add(model);

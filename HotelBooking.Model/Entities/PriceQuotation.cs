@@ -8,5 +8,6 @@ namespace HotelBooking.Model.Entities
     public class PriceQuotation : BaseEntity
     {
         public double Price { get; set; }
+        public virtual Room Room{ get; set; }
     }
 }
