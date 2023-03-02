@@ -2,7 +2,7 @@
 
 namespace HotelBooking.Data.DTOs.Hotel
 {
-    public class CreateFacilityDTO
+    public class FacilityRequest
     {
         [StringLength(250)]
         public string FacilityName { get; set; }

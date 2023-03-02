@@ -2,7 +2,7 @@
 
 namespace HotelBooking.Data.DTOs.Account
 {
-    public class RegisterDTO
+    public class RegisterRequest
     {
         [Required]
         public string Username { get; set; }

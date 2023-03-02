@@ -20,7 +20,7 @@ namespace HotelBooking.API.Controllers
 
         [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
         [HttpPost("create-hotel")]
-        public async Task<IActionResult> CreateHotelAsync([FromForm] CreateHotelDTO model)
+        public async Task<IActionResult> CreateHotelAsync([FromForm] HotelRequest model)
         {
             if (model == null)
             {
@@ -44,7 +44,7 @@ namespace HotelBooking.API.Controllers
 
         [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
         [HttpPost("create-facility")]
-        public async Task<IActionResult> CreateFacilityAsync([FromForm] CreateFacilityDTO model)
+        public async Task<IActionResult> CreateFacilityAsync([FromForm] FacilityRequest model)
         {
             if (model == null)
             {
@@ -68,7 +68,7 @@ namespace HotelBooking.API.Controllers
 
         [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
         [HttpPost("equip-room")]
-        public async Task<IActionResult> EquipRoomAsync([FromForm] EquipRoomDTO model)
+        public async Task<IActionResult> EquipRoomAsync([FromForm] EquipRoomRequest model)
         {
             if (model == null)
             {

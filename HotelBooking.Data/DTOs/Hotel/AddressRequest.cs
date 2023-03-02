@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using HotelBooking.Model.Entities;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace HotelBooking.Data.DTOs.Hotel
+namespace HotelBooking.Data.DTOs
 {
-    public class UpdateAddressDTO
+    public class AddressRequest
     {
+        [StringLength(250)]
         public string City { get; set; }
 
         [StringLength(100)]

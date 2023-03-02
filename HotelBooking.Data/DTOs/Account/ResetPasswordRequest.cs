@@ -2,7 +2,7 @@
 
 namespace HotelBooking.Data.DTOs.Account
 {
-    public class ResetPasswordDTO
+    public class ResetPasswordRequest
     {
         [EmailAddress]
         public string Email { get; set; }

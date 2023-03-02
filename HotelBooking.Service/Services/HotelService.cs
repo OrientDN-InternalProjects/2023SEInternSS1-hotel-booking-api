@@ -45,7 +45,7 @@ namespace HotelBooking.Service.Services
             this.roomServiceRepository = roomServiceRepository;
         }
 
-        public async Task<Guid> AddHotelAsync(CreateHotelDTO model)
+        public async Task<Guid> AddHotelAsync(HotelRequest model)
         {
             var address = mapper.Map<Address>(model.Address);
             address.CreatedDate = DateTime.Now;
@@ -98,7 +98,7 @@ namespace HotelBooking.Service.Services
             return service.Id;
         }
 
-        public async Task<Guid> AddFacilityAsync(CreateFacilityDTO model)
+        public async Task<Guid> AddFacilityAsync(FacilityRequest model)
         {
             var facility = mapper.Map<Facility>(model);
             facility.CreatedDate = DateTime.Now;
@@ -106,7 +106,7 @@ namespace HotelBooking.Service.Services
             await unitOfWork.SaveAsync();
             return facility.Id;
         }
-        public async Task<bool> AddServiceAndFacilityToRoomAsync(EquipRoomDTO model)
+        public async Task<bool> AddServiceAndFacilityToRoomAsync(EquipRoomRequest model)
         {
             var room = await roomRepository.GetByIdAsync(model.RoomId);
             if (room == null) return false;

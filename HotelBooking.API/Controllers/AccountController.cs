@@ -21,7 +21,7 @@ namespace HotelBooking.API.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult> RegisterAsync(RegisterDTO model)
+        public async Task<ActionResult> RegisterAsync(RegisterRequest model)
         {
             if (model == null)
             {
@@ -29,12 +29,13 @@ namespace HotelBooking.API.Controllers
                 return BadRequest("Invalid model object");
             }
             var result = await accountRepository.RegisterAsync(model);
-            if (result.IsSuccess) return Ok(result);
-            else return BadRequest(result);
+            if ((int)result.StatusCode == 404) return NotFound(result);
+            if ((int)result.StatusCode == 400) return BadRequest(result);
+            return Ok(result);
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> LoginAsync(LoginDTO model)
+        public async Task<IActionResult> LoginAsync(LoginRequest model)
         {
             if (model == null)
             {
@@ -42,12 +43,13 @@ namespace HotelBooking.API.Controllers
                 return BadRequest("Invalid model object");
             }
             var result = await accountRepository.LoginAsync(model);
-            if (result.IsSuccess) return Ok(result);
-            else return BadRequest(result);
+            if ((int)result.StatusCode == 404) return NotFound(result);
+            if ((int)result.StatusCode == 400) return BadRequest(result);
+            return Ok(result);
         }
 
         [HttpPost("forget-password")]
-        public async Task<IActionResult> ForgetPassword(ForgetPasswordDTO model)
+        public async Task<IActionResult> ForgetPassword(ForgetPasswordRequest model)
         {
             if (model == null)
             {
@@ -55,12 +57,13 @@ namespace HotelBooking.API.Controllers
                 return BadRequest("Invalid model object");
             }
             var result = await accountRepository.ForgetPassword(model);
-            if (result.IsSuccess) return Ok(result);
-            else return BadRequest(result);
+            if ((int)result.StatusCode == 404) return NotFound(result);
+            if ((int)result.StatusCode == 400) return BadRequest(result);
+            return Ok(result);
         }
 
         [HttpPost("reset-password")]
-        public async Task<IActionResult> ResetPassword(ResetPasswordDTO model)
+        public async Task<IActionResult> ResetPassword(ResetPasswordRequest model)
         {
             if (model == null)
             {
@@ -68,13 +71,14 @@ namespace HotelBooking.API.Controllers
                 return BadRequest("Invalid model object");
             }
             var result = await accountRepository.ResetPassword(model);
-            if (result.IsSuccess) return Ok(result);
-            else return BadRequest(result);
+            if ((int)result.StatusCode == 404) return NotFound(result);
+            if ((int)result.StatusCode == 400) return BadRequest(result);
+            return Ok(result);
         }
 
         [HttpPost("change-password")]
         [Authorize(AuthenticationSchemes = "Bearer")]
-        public async Task<IActionResult> ChangePassword(ChangePasswordDTO model)
+        public async Task<IActionResult> ChangePassword(ChangePasswordRequest model)
         {
             if (model == null)
             {
@@ -83,8 +87,10 @@ namespace HotelBooking.API.Controllers
             }
             var email = currentUser.UserEmail;
             var result = await accountRepository.ChangePassword(email, model);
-            if (result.IsSuccess) return Ok(result);
-            else return BadRequest(result);
+            if ((int)result.StatusCode == 404) return NotFound(result);
+            if ((int)result.StatusCode == 400) return BadRequest(result);
+            return Ok(result);
+
 
         }
     }

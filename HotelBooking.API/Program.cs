@@ -17,15 +17,12 @@ using Microsoft.OpenApi.Models;
 using NETCore.MailKit.Extensions;
 using NETCore.MailKit.Infrastructure.Internal;
 using System.Text;
-using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 var mailKitOptions = builder.Configuration.GetSection("MailSettings").Get<NETCore.MailKit.Infrastructure.Internal.MailKitOptions>();
 // Add services to the container.
 
-builder.Services.AddControllers().AddJsonOptions(x =>
-   x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
-;
+builder.Services.AddControllers();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -123,7 +120,7 @@ builder.Services.AddScoped<IServiceHotelRepository, ServiceHotelRepository>();
 builder.Services.AddScoped<IFacilityRepository, FacilityRepository>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
-builder.Services.AddScoped<IBookedRoom,IBookedRoomRepository>();
+builder.Services.AddScoped<IBookedRoom, IBookedRoomRepository>();
 
 var connectionString = builder.Configuration.GetConnectionString("Default");
 builder.Services.AddDbContext<BookingDbContext>(options =>

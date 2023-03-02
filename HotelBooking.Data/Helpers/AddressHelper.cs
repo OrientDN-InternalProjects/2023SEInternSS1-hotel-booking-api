@@ -14,8 +14,7 @@ namespace HotelBooking.Data.Helpers
     {
         public AddressHelper()
         {
-            CreateMap<CreateAddressDTO, Address>().ReverseMap();
-            CreateMap<UpdateAddressDTO, Address>().ReverseMap();
+            CreateMap<AddressRequest, Address>().ReverseMap();
         }
     }
 }
