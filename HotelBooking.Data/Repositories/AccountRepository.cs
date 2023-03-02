@@ -3,7 +3,6 @@ using HotelBooking.Common.Constants;
 using HotelBooking.Data.DTOs.Account;
 using HotelBooking.Data.Extensions;
 using HotelBooking.Data.Interfaces;
-using HotelBooking.Data.ViewModel;
 using HotelBooking.Model.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -23,9 +22,9 @@ namespace HotelBooking.Data.Repositories
         private readonly BookingDbContext context;
         private readonly IMailSender mailSender;
         private readonly ITokenManager tokenManager;
-        public AccountRepository(UserManager<User> userManager, 
-            SignInManager<User> signInManager, 
-            IConfiguration configuration, BookingDbContext context, 
+        public AccountRepository(UserManager<User> userManager,
+            SignInManager<User> signInManager,
+            IConfiguration configuration, BookingDbContext context,
             IMailSender mailSender, ITokenManager tokenManager)
         {
             this.userManager = userManager;
@@ -38,8 +37,8 @@ namespace HotelBooking.Data.Repositories
 
         public async Task<ResponseModel> ChangePassword(string email, ChangePasswordRequest model)
         {
-            var exist_user = await userManager.FindByEmailAsync(email);
-            if (exist_user == null)
+            var existUser = await userManager.FindByEmailAsync(email);
+            if (existUser == null)
             {
                 return new ResponseModel
                 {
@@ -48,12 +47,11 @@ namespace HotelBooking.Data.Repositories
                     IsSuccess = false
                 };
             }
-            var res = await userManager.ChangePasswordAsync(exist_user, model.OldPassword, model.NewPassword);
+            var res = await userManager.ChangePasswordAsync(existUser, model.OldPassword, model.NewPassword);
             if (res.Succeeded)
             {
                 await tokenManager.DeactivateCurrentAsync();
-                JwtSecurityToken jwtSecurityToken = await CreateJwtToken(exist_user);
-                result.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
+                JwtSecurityToken jwtSecurityToken = await CreateJwtToken(existUser);
                 return new ResponseModel
                 {
                     StatusCode = HttpStatusCode.OK,
@@ -76,8 +74,8 @@ namespace HotelBooking.Data.Repositories
 
         public async Task<ResponseModel> ForgetPassword(ForgetPasswordRequest model)
         {
-            var exist_user = await userManager.FindByEmailAsync(model.Email);
-            if (exist_user == null)
+            var existUser = await userManager.FindByEmailAsync(model.Email);
+            if (existUser == null)
             {
                 return new ResponseModel
                 {
@@ -86,30 +84,29 @@ namespace HotelBooking.Data.Repositories
                     IsSuccess = false
                 };
             }
-            var token = await userManager.GeneratePasswordResetTokenAsync(exist_user);
-            if (await mailSender.SendMailToResetPassword(exist_user.Email, token))
+            var token = await userManager.GeneratePasswordResetTokenAsync(existUser);
+            if (await mailSender.SendMailToResetPassword(existUser.Email, token))
             {
                 return new ResponseModel
                 {
                     StatusCode = HttpStatusCode.OK,
-                    Message = $"Please check mail at {exist_user.Email}",
+                    Message = $"Please check mail at {existUser.Email}",
                     IsSuccess = true
                 };
             }
             return new ResponseModel
             {
                 StatusCode = HttpStatusCode.BadRequest,
-                Message = $"Incorrect email for user {exist_user.Email}.",
+                Message = $"Incorrect email for user {existUser.Email}.",
                 IsSuccess = false
             };
         }
 
         public async Task<ResponseModel> LoginAsync(LoginRequest model)
         {
-            AuthenicationModel result = new AuthenicationModel();
             // Check user exists with email or not
-            var exist_user = await userManager.FindByEmailAsync(model.Email);
-            if (exist_user == null)
+            var existUser = await userManager.FindByEmailAsync(model.Email);
+            if (existUser == null)
             {
                 return new ResponseModel
                 {
@@ -118,10 +115,10 @@ namespace HotelBooking.Data.Repositories
                     IsSuccess = false
                 };
             }
-            var check = await userManager.CheckPasswordAsync(exist_user, model.Password);
+            var check = await userManager.CheckPasswordAsync(existUser, model.Password);
             if (check)
             {
-                JwtSecurityToken jwtSecurityToken = await CreateJwtToken(exist_user);
+                JwtSecurityToken jwtSecurityToken = await CreateJwtToken(existUser);
                 return new ResponseModel
                 {
                     StatusCode = HttpStatusCode.OK,
@@ -153,8 +150,8 @@ namespace HotelBooking.Data.Repositories
                 PhoneNumber = model.PhoneNumber
             };
             // Check if user with email or not
-            var exist_user = await userManager.FindByEmailAsync(user.Email);
-            if (exist_user != null)
+            var existUser = await userManager.FindByEmailAsync(user.Email);
+            if (existUser != null)
             {
                 return new ResponseModel
                 {
@@ -188,9 +185,8 @@ namespace HotelBooking.Data.Repositories
 
         public async Task<ResponseModel> ResetPassword(ResetPasswordRequest model)
         {
-            var exist_user = await userManager.FindByEmailAsync(model.Email);
-            AuthenicationModel result = new AuthenicationModel();
-            if (exist_user == null)
+            var existUser = await userManager.FindByEmailAsync(model.Email);
+            if (existUser == null)
             {
                 return new ResponseModel
                 {
@@ -199,7 +195,7 @@ namespace HotelBooking.Data.Repositories
                     IsSuccess = false
                 };
             }
-            var resetResult = await userManager.ResetPasswordAsync(exist_user, model.Token, model.Password);
+            var resetResult = await userManager.ResetPasswordAsync(existUser, model.Token, model.Password);
             if (resetResult.Succeeded)
             {
                 return new ResponseModel

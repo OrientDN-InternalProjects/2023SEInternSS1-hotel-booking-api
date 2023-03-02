@@ -33,12 +33,6 @@ namespace HotelBooking.Data.Repositories
 
         public async Task<IEnumerable<HotelVM>> GetByNameAync(string name)
         {
-            //var result = await GetByCondition(x => x.HotelName.ToLower().Contains(name.ToLower()) && x.IsDeleted == false)
-            //.Include(hotel => hotel.Urls)
-            //.Include(hotel => hotel.Rooms.Where(r => r.RoomStatus == RoomStatus.EMPTY)).ThenInclude(x => x.RoomServices)
-            //.Include(hotel => hotel.Rooms.Where(r => r.RoomStatus == RoomStatus.EMPTY)).ThenInclude(x => x.RoomFacilities)
-            //.Include(hotel => hotel.Address)
-            //.ToListAsync();
             var result = await GetByCondition(x => x.HotelName.ToLower().Contains(name.ToLower()) && x.IsDeleted == false).Select(x => new HotelVM
             {
                 HotelName = x.HotelName,

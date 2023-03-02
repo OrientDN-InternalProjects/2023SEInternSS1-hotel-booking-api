@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using HotelBooking.Common.Enums;
 using HotelBooking.Data.DTOs.Hotel;
 using HotelBooking.Data.Infrastructure;
 using HotelBooking.Data.Interfaces;
@@ -77,7 +76,7 @@ namespace HotelBooking.Service.Services
             await unitOfWork.SaveAsync();
             return hotel.Id;
         }
-        public async Task<Guid> AddRoomAsync(CreateRoomDTO model)
+        public async Task<Guid> AddRoomAsync(RoomRequest model)
         {
             var priceQuotation = mapper.Map<PriceQuotation>(model.Price);
             priceQuotation.CreatedDate = DateTime.Now;
@@ -89,7 +88,7 @@ namespace HotelBooking.Service.Services
             return room.Id;
         }
 
-        public async Task<Guid> AddExtraServiceAsync(CreateServiceHotelDTO model)
+        public async Task<Guid> AddExtraServiceAsync(ServiceHotelRequest model)
         {
             var service = mapper.Map<ExtraService>(model);
             service.CreatedDate = DateTime.Now;

@@ -1,6 +1,6 @@
 ﻿namespace HotelBooking.Data.DTOs.Hotel
 {
-    public class CreatePriceQuotationDTO
+    public class PriceRequest
     {
         public double Price { get; set; }
     }

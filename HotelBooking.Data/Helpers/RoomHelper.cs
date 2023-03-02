@@ -8,7 +8,7 @@ namespace HotelBooking.Data.Helpers
     {
         public RoomHelper()
         {
-            CreateMap<CreateRoomDTO, Room>().ReverseMap();
+            CreateMap<RoomRequest, Room>().ReverseMap();
         }
     }
 }

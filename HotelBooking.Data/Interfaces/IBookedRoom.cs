@@ -16,6 +16,5 @@ namespace HotelBooking.Data.Interfaces
         void CreateAsync(BookedRoom model);
         void UpdateAsync(BookedRoom model);
         void DeleteAsync(BookedRoom model);
-        Task<bool> CheckValidation (DurationVM newDuration,Guid roomId);
     }
 }
