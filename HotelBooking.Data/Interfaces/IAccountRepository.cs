@@ -1,14 +1,14 @@
-﻿using HotelBooking.Data.DTOs.Account;
-using HotelBooking.Data.ViewModel;
+﻿using HotelBooking.Common.Base;
+using HotelBooking.Data.DTOs.Account;
 
 namespace HotelBooking.Data.Interfaces
 {
     public interface IAccountRepository
     {
-        Task<AuthenicationModel> RegisterAsync(RegisterDTO model);
-        Task<AuthenicationModel> LoginAsync(LoginDTO model);
-        Task<AuthenicationModel> ForgetPassword(ForgetPasswordDTO model);
-        Task<AuthenicationModel> ResetPassword(ResetPasswordDTO model);
-        Task<AuthenicationModel> ChangePassword(string email, ChangePasswordDTO model);
+        Task<ResponseModel> RegisterAsync(RegisterRequest model);
+        Task<ResponseModel> LoginAsync(LoginRequest model);
+        Task<ResponseModel> ForgetPassword(ForgetPasswordRequest model);
+        Task<ResponseModel> ResetPassword(ResetPasswordRequest model);
+        Task<ResponseModel> ChangePassword(string email, ChangePasswordRequest model);
     }
 }

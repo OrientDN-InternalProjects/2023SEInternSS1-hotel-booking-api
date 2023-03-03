@@ -1,13 +1,14 @@
-﻿using HotelBooking.Common.Constants;
+﻿using HotelBooking.Common.Base;
+using HotelBooking.Common.Constants;
 using HotelBooking.Data.DTOs.Account;
 using HotelBooking.Data.Extensions;
 using HotelBooking.Data.Interfaces;
-using HotelBooking.Data.ViewModel;
 using HotelBooking.Model.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 
@@ -21,9 +22,9 @@ namespace HotelBooking.Data.Repositories
         private readonly BookingDbContext context;
         private readonly IMailSender mailSender;
         private readonly ITokenManager tokenManager;
-        public AccountRepository(UserManager<User> userManager, 
-            SignInManager<User> signInManager, 
-            IConfiguration configuration, BookingDbContext context, 
+        public AccountRepository(UserManager<User> userManager,
+            SignInManager<User> signInManager,
+            IConfiguration configuration, BookingDbContext context,
             IMailSender mailSender, ITokenManager tokenManager)
         {
             this.userManager = userManager;
@@ -34,83 +35,111 @@ namespace HotelBooking.Data.Repositories
             this.tokenManager = tokenManager;
         }
 
-        public async Task<AuthenicationModel> ChangePassword(string email, ChangePasswordDTO model)
+        public async Task<ResponseModel> ChangePassword(string email, ChangePasswordRequest model)
         {
-            var exist_user = await userManager.FindByEmailAsync(email);
-            AuthenicationModel result = new AuthenicationModel();
-            if (exist_user == null)
+            var existUser = await userManager.FindByEmailAsync(email);
+            if (existUser == null)
             {
-                result.Message = $"Can't find any user with {email}";
-                result.IsSuccess = false;
-                return result;
+                return new ResponseModel
+                {
+                    StatusCode = HttpStatusCode.NotFound,
+                    Message = $"Can't find any user with {email}",
+                    IsSuccess = false
+                };
             }
-            var res = await userManager.ChangePasswordAsync(exist_user, model.OldPassword, model.NewPassword);
+            var res = await userManager.ChangePasswordAsync(existUser, model.OldPassword, model.NewPassword);
             if (res.Succeeded)
             {
                 await tokenManager.DeactivateCurrentAsync();
-                JwtSecurityToken jwtSecurityToken = await CreateJwtToken(exist_user);
-                result.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
-                result.Message = "Congrats! Change password successfully!";
-                result.IsSuccess = true;
-                return result;
+                JwtSecurityToken jwtSecurityToken = await CreateJwtToken(existUser);
+                return new ResponseModel
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Message = "Congrats! Change password successfully!",
+                    Data = new
+                    {
+                        token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken)
+                    },
+                    IsSuccess = true,
+                };
             }
-            result.Message = "Change-password failed";
-            List<IdentityError> errors = res.Errors.ToList();
-            result.Error = string.Join(", ", errors.Select(e => e.Description));
-            result.IsSuccess = false;
-            return result;
+            return new ResponseModel
+            {
+                StatusCode = HttpStatusCode.BadRequest,
+                Message = "Change-password failed",
+                Errors = string.Join(", ", res.Errors.ToList().Select(e => e.Description)),
+                IsSuccess = false
+            };
         }
 
-        public async Task<AuthenicationModel> ForgetPassword(ForgetPasswordDTO model)
+        public async Task<ResponseModel> ForgetPassword(ForgetPasswordRequest model)
         {
-            var exist_user = await userManager.FindByEmailAsync(model.Email);
-            AuthenicationModel result = new AuthenicationModel();
-            if (exist_user == null)
+            var existUser = await userManager.FindByEmailAsync(model.Email);
+            if (existUser == null)
             {
-                result.Message = $"Can't find any user with {model.Email}";
-                result.IsSuccess = false;
-                return result;
+                return new ResponseModel
+                {
+                    StatusCode = HttpStatusCode.NotFound,
+                    Message = $"Can't find any user with {model.Email}",
+                    IsSuccess = false
+                };
             }
-            var token = await userManager.GeneratePasswordResetTokenAsync(exist_user);
-            if (await mailSender.SendMailToResetPassword(exist_user.Email, token))
+            var token = await userManager.GeneratePasswordResetTokenAsync(existUser);
+            if (await mailSender.SendMailToResetPassword(existUser.Email, token))
             {
-                result.Message = $"Please check mail at {exist_user.Email}";
-                result.IsSuccess = true;
-                return result;
+                return new ResponseModel
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Message = $"Please check mail at {existUser.Email}",
+                    IsSuccess = true
+                };
             }
-            result.Message = $"Incorrect email for user {exist_user.Email}.";
-            result.IsSuccess = false;
-            return result;
+            return new ResponseModel
+            {
+                StatusCode = HttpStatusCode.BadRequest,
+                Message = $"Incorrect email for user {existUser.Email}.",
+                IsSuccess = false
+            };
         }
 
-        public async Task<AuthenicationModel> LoginAsync(LoginDTO model)
+        public async Task<ResponseModel> LoginAsync(LoginRequest model)
         {
-            AuthenicationModel result = new AuthenicationModel();
             // Check user exists with email or not
-            var exist_user = await userManager.FindByEmailAsync(model.Email);
-            if (exist_user == null)
+            var existUser = await userManager.FindByEmailAsync(model.Email);
+            if (existUser == null)
             {
-                result.Message = $"Can't find any user with {model.Email}";
-                result.IsSuccess = false;
-                return result;
+                return new ResponseModel
+                {
+                    StatusCode = HttpStatusCode.NotFound,
+                    Message = $"Can't find any user with {model.Email}",
+                    IsSuccess = false
+                };
             }
-            var check = await userManager.CheckPasswordAsync(exist_user, model.Password);
+            var check = await userManager.CheckPasswordAsync(existUser, model.Password);
             if (check)
             {
-                result.Message = "Login successfully";
-                JwtSecurityToken jwtSecurityToken = await CreateJwtToken(exist_user);
-                result.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
-                result.IsSuccess = true;
-                return result;
+                JwtSecurityToken jwtSecurityToken = await CreateJwtToken(existUser);
+                return new ResponseModel
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Message = "Login successfully",
+                    Data = new
+                    {
+                        token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken)
+                    },
+                    IsSuccess = true
+                };
             }
-            result.Message = $"Login failed. Password wrong!";
-            result.IsSuccess = false;
-            return result;
+            return new ResponseModel
+            {
+                StatusCode = HttpStatusCode.BadRequest,
+                Message = $"Login failed. Password wrong!",
+                IsSuccess = false
+            };
         }
 
-        public async Task<AuthenicationModel> RegisterAsync(RegisterDTO model)
+        public async Task<ResponseModel> RegisterAsync(RegisterRequest model)
         {
-            AuthenicationModel result = new AuthenicationModel();
             var user = new User
             {
                 Email = model.Email,
@@ -121,12 +150,15 @@ namespace HotelBooking.Data.Repositories
                 PhoneNumber = model.PhoneNumber
             };
             // Check if user with email or not
-            var exist_user = await userManager.FindByEmailAsync(user.Email);
-            if (exist_user != null)
+            var existUser = await userManager.FindByEmailAsync(user.Email);
+            if (existUser != null)
             {
-                result.Message = $"User with {model.Email} exists. Please use another email!";
-                result.IsSuccess = false;
-                return result;
+                return new ResponseModel
+                {
+                    StatusCode = HttpStatusCode.NotFound,
+                    Message = $"User existed with {model.Email}",
+                    IsSuccess = false
+                };
             }
             else
             {
@@ -134,40 +166,52 @@ namespace HotelBooking.Data.Repositories
                 if (return_result.Succeeded)
                 {
                     await userManager.AddToRoleAsync(user, RoleConstant.CustomerRole);
-                    result.Message = "Register successfully";
-                    result.IsSuccess = true;
-                    return result;
+                    return new ResponseModel
+                    {
+                        StatusCode = HttpStatusCode.OK,
+                        Message = "Register successfully",
+                        IsSuccess = true
+                    };
                 }
-                result.Message = "Register failed";
-                List<IdentityError> errors = return_result.Errors.ToList();
-                result.Error = string.Join(", ", errors.Select(e => e.Description));
-                result.IsSuccess = false;
-                return result;
+                return new ResponseModel
+                {
+                    StatusCode = HttpStatusCode.BadRequest,
+                    Message = "Register failed",
+                    Errors = string.Join(", ", return_result.Errors.ToList().Select(e => e.Description)),
+                    IsSuccess = false
+                };
             }
         }
 
-        public async Task<AuthenicationModel> ResetPassword(ResetPasswordDTO model)
+        public async Task<ResponseModel> ResetPassword(ResetPasswordRequest model)
         {
-            var exist_user = await userManager.FindByEmailAsync(model.Email);
-            AuthenicationModel result = new AuthenicationModel();
-            if (exist_user == null)
+            var existUser = await userManager.FindByEmailAsync(model.Email);
+            if (existUser == null)
             {
-                result.Message = $"Can't find any user with {model.Email}";
-                result.IsSuccess = false;
-                return result;
+                return new ResponseModel
+                {
+                    StatusCode = HttpStatusCode.NotFound,
+                    Message = $"Can't find any user with {model.Email}",
+                    IsSuccess = false
+                };
             }
-            var resetResult = await userManager.ResetPasswordAsync(exist_user, model.Token, model.Password);
+            var resetResult = await userManager.ResetPasswordAsync(existUser, model.Token, model.Password);
             if (resetResult.Succeeded)
             {
-                result.Message = "Congrats! Reset password successfully!";
-                result.IsSuccess = true;
-                return result;
+                return new ResponseModel
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Message = "Congrats! Reset password successfully!",
+                    IsSuccess = true
+                };
             }
-            result.Message = "reset-password failed";
-            List<IdentityError> errors = resetResult.Errors.ToList();
-            result.Error = string.Join(", ", errors.Select(e => e.Description));
-            result.IsSuccess = false;
-            return result;
+            return new ResponseModel
+            {
+                StatusCode = HttpStatusCode.BadRequest,
+                Message = "reset-password failed",
+                Errors = string.Join(", ", resetResult.Errors.ToList().Select(e => e.Description)),
+                IsSuccess = false
+            };
         }
 
         private async Task<JwtSecurityToken> CreateJwtToken(User user)
@@ -197,5 +241,6 @@ namespace HotelBooking.Data.Repositories
                 signingCredentials: signingCredentials);
             return jwtSecurityToken;
         }
+
     }
 }

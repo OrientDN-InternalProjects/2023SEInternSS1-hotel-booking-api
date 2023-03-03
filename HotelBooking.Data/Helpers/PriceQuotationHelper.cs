@@ -8,8 +8,7 @@ namespace HotelBooking.Data.Helpers
     {
         public PriceQuotationHelper()
         {
-            CreateMap<CreatePriceQuotationDTO, PriceQuotation>().ReverseMap();
-            CreateMap<UpdatePriceQuotationDTO, PriceQuotation>().ReverseMap();
+            CreateMap<PriceRequest, PriceQuotation>().ReverseMap();
         }
     }
 }

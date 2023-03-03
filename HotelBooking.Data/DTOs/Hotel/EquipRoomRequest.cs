@@ -1,6 +1,6 @@
 ﻿namespace HotelBooking.Data.DTOs.Hotel
 {
-    public class EquipRoomDTO
+    public class EquipRoomRequest
     {
         public Guid RoomId { get; set; }
         public IEnumerable<string> ServiceIds { get; set; }

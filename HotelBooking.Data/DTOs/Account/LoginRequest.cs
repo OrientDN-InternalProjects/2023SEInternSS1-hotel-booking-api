@@ -2,7 +2,7 @@
 
 namespace HotelBooking.Data.DTOs.Account
 {
-    public class LoginDTO
+    public class LoginRequest
     {
         [Required]
         [EmailAddress]

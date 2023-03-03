@@ -2,7 +2,7 @@
 
 namespace HotelBooking.Data.DTOs.Account
 {
-    public class ChangePasswordDTO
+    public class ChangePasswordRequest
     {
         [Required]
         [DataType(DataType.Password)]

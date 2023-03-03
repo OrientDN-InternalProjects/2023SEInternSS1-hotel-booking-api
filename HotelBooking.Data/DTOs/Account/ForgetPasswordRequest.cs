@@ -2,7 +2,7 @@
 
 namespace HotelBooking.Data.DTOs.Account
 {
-    public class ForgetPasswordDTO
+    public class ForgetPasswordRequest
     {
         [Required]
         [EmailAddress]
