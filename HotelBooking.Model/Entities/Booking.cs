@@ -1,4 +1,5 @@
 ﻿using HotelBooking.Common.Base;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HotelBooking.Model.Entities
@@ -7,6 +8,8 @@ namespace HotelBooking.Model.Entities
     public class Booking : BaseEntity
     {
         public double Amount { get; set; }
+
+        [DefaultValue(false)]
         public bool? PaymentStatus { get; set; }
         public virtual ICollection<BookedRoom> BookedRooms { get; set; }
         public DateTime From { get; set; }

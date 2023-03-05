@@ -1,4 +1,5 @@
 ﻿using HotelBooking.Common.Enums;
+using HotelBooking.Data.DTOs.Hotel;
 
 namespace HotelBooking.Data.ViewModel
 {
@@ -6,7 +7,7 @@ namespace HotelBooking.Data.ViewModel
     {
         public RoomType? RoomType { get; set; }
         public string Description { get; set; }
-        public IEnumerable<ServiceVM> ExtraServices { get; set; }
-        public IEnumerable<FacilityVM> Facilities { get; set; }
+        public IEnumerable<ServiceHotelModel> ExtraServices { get; set; }
+        public IEnumerable<FacilityModel> Facilities { get; set; }
     }
 }

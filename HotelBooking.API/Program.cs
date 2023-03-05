@@ -55,7 +55,7 @@ builder.Services.AddSwaggerGen(option =>
 });
 builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddTransient<TokenManagerMiddleware>();
-builder.Services.AddScoped<ITokenManager,TokenManager>();
+builder.Services.AddScoped<ITokenManager, TokenManager>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
@@ -120,7 +120,8 @@ builder.Services.AddScoped<IServiceHotelRepository, ServiceHotelRepository>();
 builder.Services.AddScoped<IFacilityRepository, FacilityRepository>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
-builder.Services.AddScoped<IBookedRoom, IBookedRoomRepository>();
+builder.Services.AddScoped<IBookedRoom, BookedRoomRepository>();
+builder.Services.AddScoped<ICheckDurationValidationService, CheckDurationValidationService>();
 
 var connectionString = builder.Configuration.GetConnectionString("Default");
 builder.Services.AddDbContext<BookingDbContext>(options =>

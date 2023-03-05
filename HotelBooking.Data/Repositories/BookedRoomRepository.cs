@@ -1,14 +1,13 @@
 ﻿using HotelBooking.Data.Infrastructure;
 using HotelBooking.Data.Interfaces;
-using HotelBooking.Data.ViewModel;
 using HotelBooking.Model.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace HotelBooking.Data.Repositories
 {
-    public class IBookedRoomRepository : GenericRepository<BookedRoom>, IBookedRoom
+    public class BookedRoomRepository : GenericRepository<BookedRoom>, IBookedRoom
     {
-        public IBookedRoomRepository(BookingDbContext context) : base(context)
+        public BookedRoomRepository(BookingDbContext context) : base(context)
         {
         }
 

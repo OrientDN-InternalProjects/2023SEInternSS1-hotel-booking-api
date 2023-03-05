@@ -1,13 +1,24 @@
-﻿using HotelBooking.Data.ViewModel;
+﻿using HotelBooking.Data.Interfaces;
+using HotelBooking.Data.ViewModel;
+using HotelBooking.Service.IServices;
+using Microsoft.EntityFrameworkCore;
 
-namespace HotelBooking.Data.Comparer
+namespace HotelBooking.Service.Services
 {
-    public class Check
+    public class CheckDurationValidationService : ICheckDurationValidationService
     {
-        public static bool CheckValidDuration(DurationVM newDuration, List<DurationVM> list)
+        private readonly IBookedRoom bookedRoomRepository;
+
+        public CheckDurationValidationService(IBookedRoom bookedRoomRepository)
         {
+            this.bookedRoomRepository = bookedRoomRepository;
+        }
+
+        public async Task<bool> CheckValidationDurationForRoom(DurationVM newDuration, Guid roomId)
+        {
+            var returnObjects = await bookedRoomRepository.GetAll().Where(x => x.RoomId.Equals(roomId)).Select(x => new DurationVM { From = x.From.Date, To = x.To.Date }).ToListAsync();
             SortedList<DateTime, bool> times = new SortedList<DateTime, bool>();
-            foreach (var item in list)
+            foreach (var item in returnObjects)
             {
                 if (times.ContainsKey(item.From))
                 {
@@ -26,7 +37,6 @@ namespace HotelBooking.Data.Comparer
                     times.Add(item.To, false);
                 }
             }
-
             if (DateTime.Compare(newDuration.From.Date, times.ElementAt(times.Count - 1).Key.Date) >= 0)
                 return true;
             if (times.ContainsKey(newDuration.From))
@@ -40,7 +50,6 @@ namespace HotelBooking.Data.Comparer
                 }
                 return false;
             }
-
             if (times.ContainsKey(newDuration.To))
             {
                 return false;

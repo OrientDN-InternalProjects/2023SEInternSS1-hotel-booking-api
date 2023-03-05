@@ -55,7 +55,6 @@ namespace HotelBooking.Data.DataSeeder
                     logger.LogInformation("Seeded Employee Role.");
                 }
 
-                // Check if User Exists
                 var superUser = new User()
                 {
                     FullName = "Hana Ma Canada",

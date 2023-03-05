@@ -1,14 +1,15 @@
 ﻿using HotelBooking.Common.Base;
+using HotelBooking.Data.DTOs.Booking;
 using HotelBooking.Data.ViewModel;
 
 namespace HotelBooking.Service.IServices
 {
     public interface IBookingService
     {
-        public Task<IEnumerable<HotelVM>> SearchHotelByName(string name);
-        Task<ResponseModel> AddBookingAsync(BookingVM model);
-        Task<bool> CheckValidationDurationForRoom(DurationVM model, Guid roomId);
-        Task<bool> UpdateBookingAsync(BookingVM model, Guid id);
+        Task<ResponseModel> AddBookingAsync(BookingRequest model);
+        Task<bool> UpdateBookingAsync(BookingRequest model, Guid id);
         Task<bool> DeleteBookingAsync(Guid id);
+        Task<BookingResponse> GetBookingById(Guid id);
+        Task<IEnumerable<BookingResponse>> GetAllBookingsByUser(string email);
     }
 }

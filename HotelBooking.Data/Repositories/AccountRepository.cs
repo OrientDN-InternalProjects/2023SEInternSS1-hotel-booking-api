@@ -25,7 +25,8 @@ namespace HotelBooking.Data.Repositories
         public AccountRepository(UserManager<User> userManager,
             SignInManager<User> signInManager,
             IConfiguration configuration, BookingDbContext context,
-            IMailSender mailSender, ITokenManager tokenManager)
+            IMailSender mailSender, ITokenManager tokenManager
+            )
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
@@ -100,6 +101,18 @@ namespace HotelBooking.Data.Repositories
                 Message = $"Incorrect email for user {existUser.Email}.",
                 IsSuccess = false
             };
+        }
+
+        public async Task<User> GetUserByEmail(string email)
+        {
+            var user = await userManager.FindByEmailAsync(email);
+            return user;
+        }
+
+        public async Task<User> GetUserById(string id)
+        {
+            var user = await userManager.FindByIdAsync(id);
+            return user;
         }
 
         public async Task<ResponseModel> LoginAsync(LoginRequest model)
