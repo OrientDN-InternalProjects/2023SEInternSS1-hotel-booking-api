@@ -179,5 +179,21 @@ namespace HotelBooking.Service.Services
             return mapper.Map<IEnumerable<HotelModel>>(hotels);
         }
 
-    }
+        public async Task<IEnumerable<HotelModel>> GetHotelByName(string name)
+        {
+            var dataSet = hotelRepository.GetAllHotels();
+            var result = await dataSet.ApplyFilterByName(name)
+                                      .Include(x => x.Address)
+                                      .Include(x => x.Urls)
+                                      .Include(x => x.Rooms).ThenInclude(x => x.RoomFacilities).ThenInclude(x => x.Facility)
+                                      .Include(x => x.Rooms).ThenInclude(x => x.RoomServices).ThenInclude(x => x.Service)
+                                      .ToListAsync();
+            if (result.Any())
+            {
+                return mapper.Map<IEnumerable<HotelModel>>(result);
+            }
+            return default;
+        }
+
+    }  
 }

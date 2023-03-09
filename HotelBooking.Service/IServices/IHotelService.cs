@@ -11,5 +11,6 @@ namespace HotelBooking.Service.IServices
         Task<Guid> AddExtraServiceAsync(ServiceHotelModel model);
         Task<Guid> AddFacilityAsync(FacilityModel model);
         Task<bool> AddServiceAndFacilityToRoomAsync(EquipRoomRequest model);
+        Task<IEnumerable<HotelModel>> GetHotelByName(string name);
     }
 }

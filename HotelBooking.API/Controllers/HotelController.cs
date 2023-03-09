@@ -68,6 +68,20 @@ namespace HotelBooking.API.Controllers
             });
         }
 
+        [HttpGet("get-hotel-by-name")]
+        public async Task<IActionResult> GetHotelByNameAsync(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                logger.LogError("Invalid name fo find");
+                return BadRequest("Invalid model object");
+            }
+            var result = await hotelService.GetHotelByName(name);
+            return result != null ?
+                 StatusCode(StatusCodes.Status200OK, new ResponseModel { StatusCode = HttpStatusCode.OK, IsSuccess = true, Data = new { data = result, } })
+                : StatusCode(StatusCodes.Status404NotFound, new ResponseModel { StatusCode = HttpStatusCode.NotFound, IsSuccess = false });
+        }
+
         [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
         [HttpPost("create-room")]
         public async Task<IActionResult> CreateRoomAsync([FromForm] RoomRequest model)
