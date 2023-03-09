@@ -110,6 +110,45 @@ namespace HotelBooking.Service.Services
             await unitOfWork.SaveAsync();
             return facility.Id;
         }
+
+        public async Task<FacilityModel> GetFacilityById(Guid id)
+        {
+            var facility = await facilityRepository.GetFacilityByIdAsync(id);
+            if (facility != null)
+            {
+                return mapper.Map<FacilityModel>(facility);
+            }
+            return default;
+        }
+
+        public async Task<IEnumerable<FacilityModel>> GetAllFacilities()
+        {
+            var facilities = await facilityRepository.GetAllFacilityAsync();
+            return mapper.Map<IEnumerable<FacilityModel>>(facilities);
+        }
+
+        public async Task<bool> UpdateFacilityAsync(FacilityModel model)
+        {
+            if (model.Id == null) return false;
+            var facility = await facilityRepository.GetFacilityByIdAsync(model.Id);
+            if (facility == null) return false;
+            facility.FacilityName = model.FacilityName;
+            facility.UpdatedDate = DateTime.Now;
+            facilityRepository.UpdateFacility(facility);
+            await unitOfWork.SaveAsync();
+            return true;
+        }
+
+        public async Task<bool> DeleteFacilityAsync(Guid id)
+        {
+            var facility = await facilityRepository.GetFacilityByIdAsync(id);
+            if (facility == null) return false;
+            facility.DeletedDate = DateTime.Now;
+            facility.IsDeleted = true;
+            await unitOfWork.SaveAsync();
+            return true;
+        }
+
         public async Task<bool> AddServiceAndFacilityToRoomAsync(EquipRoomRequest model)
         {
             var room = await roomRepository.GetByIdAsync(model.RoomId);

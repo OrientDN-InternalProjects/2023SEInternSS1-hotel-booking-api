@@ -9,7 +9,13 @@ namespace HotelBooking.Service.IServices
         Task<IEnumerable<HotelModel>> GetHotelByAddressTypeRoomDuration(FilterHotelRequest model);
         Task<Guid> AddRoomAsync(RoomRequest model);
         Task<Guid> AddExtraServiceAsync(ServiceHotelModel model);
+
         Task<Guid> AddFacilityAsync(FacilityModel model);
+        Task<FacilityModel> GetFacilityById(Guid id);
+        Task<IEnumerable<FacilityModel>> GetAllFacilities();
+        Task<bool> UpdateFacilityAsync(FacilityModel model);
+        Task<bool> DeleteFacilityAsync(Guid id);
+
         Task<bool> AddServiceAndFacilityToRoomAsync(EquipRoomRequest model);
     }
 }

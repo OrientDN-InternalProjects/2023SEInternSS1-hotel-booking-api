@@ -94,11 +94,6 @@ namespace HotelBooking.API.Controllers
         [HttpPost("create-facility")]
         public async Task<IActionResult> CreateFacilityAsync([FromForm] FacilityModel model)
         {
-            if (model == null)
-            {
-                logger.LogError("Invalid model sent from client.");
-                return BadRequest("Invalid model object");
-            }
             var result = await hotelService.AddFacilityAsync(model);
             return StatusCode(StatusCodes.Status201Created, new ResponseModel
             {
@@ -110,6 +105,44 @@ namespace HotelBooking.API.Controllers
                 },
                 IsSuccess = true
             });
+        }
+
+        [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+        [HttpPut("update-facility")]
+        public async Task<IActionResult> UpdateFacilityAsync(FacilityModel model)
+        {
+            var result = await hotelService.UpdateFacilityAsync(model);
+            return result
+              ? StatusCode(StatusCodes.Status200OK, new ResponseModel { StatusCode = HttpStatusCode.OK, IsSuccess = true }) :
+              StatusCode(StatusCodes.Status400BadRequest, new ResponseModel { StatusCode = HttpStatusCode.BadRequest, IsSuccess = false });
+        }
+
+        [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+        [HttpDelete("delete-facility")]
+        public async Task<IActionResult> DeleteFacility(Guid id)
+        {
+            var result = await hotelService.DeleteFacilityAsync(id);
+            return result
+                ? StatusCode(StatusCodes.Status200OK, new ResponseModel { StatusCode = HttpStatusCode.OK, IsSuccess = true, Data = new { Guid = id } }) :
+                StatusCode(StatusCodes.Status400BadRequest, new ResponseModel { StatusCode = HttpStatusCode.BadRequest, IsSuccess = false });
+        }
+
+        [HttpGet("get-all-facilities")]
+        public async Task<IActionResult> GetAllFacilities()
+        {
+            var result = await hotelService.GetAllFacilities();
+            return (result != null) ?
+                StatusCode(StatusCodes.Status200OK, new ResponseModel { StatusCode = HttpStatusCode.OK, IsSuccess = true, Data = result })
+                : StatusCode(StatusCodes.Status404NotFound, new ResponseModel { StatusCode = HttpStatusCode.NotFound, IsSuccess = false });
+        }
+
+        [HttpGet("get-facility-by-id")]
+        public async Task<IActionResult> GetFacilityById(Guid id)
+        {
+            var result = await hotelService.GetFacilityById(id);
+            return (result != null) ?
+                StatusCode(StatusCodes.Status200OK, new ResponseModel { StatusCode = HttpStatusCode.OK, IsSuccess = true, Data = result }) :
+                StatusCode(StatusCodes.Status404NotFound, new ResponseModel { StatusCode = HttpStatusCode.NotFound, IsSuccess = false });
         }
 
         [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
