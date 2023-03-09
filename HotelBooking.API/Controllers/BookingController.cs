@@ -25,28 +25,6 @@ namespace HotelBooking.API.Controllers
             this.currentUser = currentUser;
         }
 
-        [HttpGet("search-hotel")]
-        public async Task<IActionResult> SearchHotelByNameAsync(string name)
-        {
-            if (string.IsNullOrEmpty(name))
-            {
-                logger.LogError("Invalid name fo find");
-                return BadRequest("Invalid model object");
-            }
-            logger.LogInformation($"Search hotel by name {name} and show Detail");
-            var res = await bookingService.SearchHotelByName(name);
-            if (!res.Any())
-            {
-                logger.LogError("Can't find any hotels");
-                return StatusCode(StatusCodes.Status404NotFound, new ResponseModel
-                {
-                    StatusCode = HttpStatusCode.NotFound,
-                    Message = "Can't find any hotels",
-                });
-            }
-            return Ok(res);
-        }
-
 
         [HttpPost("create-booking")]
         public async Task<IActionResult> CreateBookingAsync([FromForm] BookingVM model)
