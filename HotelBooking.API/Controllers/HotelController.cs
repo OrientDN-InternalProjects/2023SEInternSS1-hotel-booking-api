@@ -73,7 +73,6 @@ namespace HotelBooking.API.Controllers
         {
             if (string.IsNullOrEmpty(name))
             {
-                logger.LogError("Invalid name fo find");
                 return BadRequest("Invalid model object");
             }
             var result = await hotelService.GetHotelByName(name);
@@ -86,11 +85,6 @@ namespace HotelBooking.API.Controllers
         [HttpPost("create-room")]
         public async Task<IActionResult> CreateRoomAsync([FromForm] RoomRequest model)
         {
-            if (model == null)
-            {
-                logger.LogError("Invalid model sent from client.");
-                return BadRequest("Invalid model object");
-            }
             var result = (await hotelService.AddRoomAsync(model));
             return StatusCode(StatusCodes.Status201Created, new ResponseModel
             {
@@ -163,11 +157,6 @@ namespace HotelBooking.API.Controllers
         [HttpPost("create-service")]
         public async Task<IActionResult> CreateServiceAsync([FromForm] ServiceHotelModel model)
         {
-            if (model == null)
-            {
-                logger.LogError("Invalid model sent from client.");
-                return BadRequest("Invalid model object");
-            }
             var result = await hotelService.AddExtraServiceAsync(model);
             return StatusCode(StatusCodes.Status201Created, new ResponseModel
             {
@@ -185,11 +174,6 @@ namespace HotelBooking.API.Controllers
         [HttpPut("update-service")]
         public async Task<IActionResult> UpdateServiceAsync(ServiceHotelModel model)
         {
-            if (model == null)
-            {
-                logger.LogError("Invalid model sent from client.");
-                return BadRequest("Invalid model object");
-            }
             var result = await hotelService.UpdateExtraService(model);
             return result ?
                 StatusCode(StatusCodes.Status200OK, new ResponseModel { StatusCode = HttpStatusCode.OK, IsSuccess = true })
@@ -228,11 +212,6 @@ namespace HotelBooking.API.Controllers
         [HttpPost("equip-room")]
         public async Task<IActionResult> EquipRoomAsync([FromForm] EquipRoomRequest model)
         {
-            if (model == null)
-            {
-                logger.LogError("Invalid model sent from client.");
-                return BadRequest("Invalid model object");
-            }
             var result = await hotelService.AddServiceAndFacilityToRoomAsync(model);
             return StatusCode(StatusCodes.Status201Created,
                 new ResponseModel

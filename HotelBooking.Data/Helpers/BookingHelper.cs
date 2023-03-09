@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using HotelBooking.Data.DTOs.Booking;
 using HotelBooking.Data.ViewModel;
 using HotelBooking.Model.Entities;
 
@@ -13,9 +14,9 @@ namespace HotelBooking.Data.Helpers
     {
         public BookingHelper()
         {
-            //CreateMap<BookingRequest, Booking>().ReverseMap();
-            //CreateMap<Booking, BookingResponse>()
-            //    .ForPath(desc => desc.Rooms, opt => opt.MapFrom(src => src.BookedRooms.Select(x => x.Room)));
+            CreateMap<BookingRequest, Booking>().ReverseMap();
+            CreateMap<Booking, BookingResponse>()
+                .ForPath(desc => desc.Rooms, opt => opt.MapFrom(src => src.BookedRooms.Select(x => x.Room)));
         }
     }
 }

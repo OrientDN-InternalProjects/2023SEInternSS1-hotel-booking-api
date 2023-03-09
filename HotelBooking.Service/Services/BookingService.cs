@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using HotelBooking.Common.Base;
+using HotelBooking.Data.DTOs.Booking;
 using HotelBooking.Data.Extensions;
 using HotelBooking.Data.Infrastructure;
 using HotelBooking.Data.Interfaces;
@@ -18,14 +19,15 @@ namespace HotelBooking.Service.Services
         private readonly IRoomRepository roomRepository;
         private readonly IRoomService roomServiceRepository;
         private readonly IMailSender mailSender;
-        private readonly IPriceQuotationRepository priceQuotation;
+        private readonly IAccountRepository accountRepository;
 
         private readonly IMapper mapper;
         private readonly IUnitOfWork unitOfWork;
         public BookingService(IHotelRepository hotelRepository,
             IBookedRoom bookedRoomRepository, IBookingRepository bookingRepository,
             IRoomRepository roomRepository, IMapper mapper, IUnitOfWork unitOfWork,
-            IRoomService roomServiceRepository, IMailSender mailSender, IPriceQuotationRepository priceQuotation)
+            IRoomService roomServiceRepository, IMailSender mailSender,
+            IAccountRepository accountRepository)
         {
             this.hotelRepository = hotelRepository;
             this.bookedRoomRepository = bookedRoomRepository;
@@ -35,10 +37,10 @@ namespace HotelBooking.Service.Services
             this.unitOfWork = unitOfWork;
             this.roomServiceRepository = roomServiceRepository;
             this.mailSender = mailSender;
-            this.priceQuotation = priceQuotation;
+            this.accountRepository = accountRepository;
         }
 
-        public async Task<ResponseModel> AddBookingAsync(BookingVM model)
+        public async Task<ResponseModel> AddBookingAsync(BookingRequest model)
         {
             var booking = new Booking()
             {
@@ -72,19 +74,8 @@ namespace HotelBooking.Service.Services
                 bookedRoomRepository.CreateAsync(bookedRoom);
             }
             await unitOfWork.SaveAsync();
-            var responseEmail = new InforBookingResponse
-            {
-                Id = booking.Id,
-                Amount = booking.Amount,
-                From = booking.From,
-                To = booking.To,
-                Rooms = booking.BookedRooms.Select(x => new RoomVM
-                {
-                    RoomType = x.Room.RoomType,
-                    Description = x.Room.Description
-                }).ToList()
-            };
-            await mailSender.SendInforOfBooking(model.Email, responseEmail);
+
+            //await mailSender.SendInforOfBooking(model.Email, booking.Id.ToString());
             return new ResponseModel
             {
                 StatusCode = System.Net.HttpStatusCode.Created,
@@ -96,60 +87,9 @@ namespace HotelBooking.Service.Services
             };
         }
 
-        public async Task<bool> CheckValidationDurationForRoom(DurationVM newDuration, Guid roomId)
-        {
-            var returnObjects = await bookedRoomRepository.GetAll().Where(x => x.RoomId.Equals(roomId)).Select(x => new DurationVM { From = x.From.Date, To = x.To.Date }).ToListAsync();
-            SortedList<DateTime, bool> times = new SortedList<DateTime, bool>();
-            foreach (var item in returnObjects)
-            {
-                if (times.ContainsKey(item.From))
-                {
-                    times.Remove(item.From);
-                }
-                else
-                {
-                    times.Add(item.From, true);
-                }
-                if (times.ContainsKey(item.To))
-                {
-                    times.Remove(item.To);
-                }
-                else
-                {
-                    times.Add(item.To, false);
-                }
-            }
-            if (DateTime.Compare(newDuration.From.Date, times.ElementAt(times.Count - 1).Key.Date) >= 0)
-                return true;
-            if (times.ContainsKey(newDuration.From))
-            {
-                if (times[newDuration.From].Equals(false))
-                {
-                    var next_checkIn_Index = times.IndexOfKey(newDuration.From) + 1;
-                    if (next_checkIn_Index > times.Count) { return true; }
-                    if (DateTime.Compare(newDuration.To.Date, times.ElementAt(next_checkIn_Index).Key.Date) <= 0)
-                        return true;
-                }
-                return false;
-            }
-            if (times.ContainsKey(newDuration.To))
-            {
-                return false;
-            }
-            times.Add(newDuration.From, true);
-            times.Add(newDuration.To, false);
-            int from_index = times.IndexOfKey(newDuration.From);
-            int to_index = times.IndexOfKey(newDuration.To);
-            if (to_index - from_index != 1)
-            {
-                return false;
-            }
-            return true;
-        }
-
         public async Task<bool> DeleteBookingAsync(Guid Id)
         {
-            var res = await bookingRepository.GetByIdAsync(Id);
+            var res = await bookingRepository.GetByIdAsync(Id).FirstOrDefaultAsync();
 
             if (res == null) return false;
 
@@ -160,9 +100,9 @@ namespace HotelBooking.Service.Services
             return true;
         }
 
-        public async Task<bool> UpdateBookingAsync(BookingVM model, Guid Id)
+        public async Task<bool> UpdateBookingAsync(BookingRequest model, Guid Id)
         {
-            var res = await bookingRepository.GetByIdAsync(Id);
+            var res = await bookingRepository.GetByIdAsync(Id).FirstOrDefaultAsync();
             if (res == null) return false;
             var booking = mapper.Map<Booking>(res);
             booking.Amount = CalculateFee(model.RoomIds);
@@ -190,6 +130,38 @@ namespace HotelBooking.Service.Services
             }
             await unitOfWork.SaveAsync();
             return true;
+        }
+
+        public async Task<IEnumerable<BookingResponse>> GetAllBookingsByUser(string email)
+        {
+            var bookings = await bookingRepository.GetByUserEmail(email)
+                           .Include(x => x.BookedRooms).ThenInclude(x => x.Room).ThenInclude(x => x.RoomFacilities).ThenInclude(x => x.Facility)
+                           .Include(x => x.BookedRooms).ThenInclude(x => x.Room).ThenInclude(x => x.RoomServices).ThenInclude(x => x.Service)
+                           .ToListAsync();
+            if (bookings.Any())
+            {
+                return mapper.Map<IEnumerable<BookingResponse>>(bookings);
+            }
+            return default;
+        }
+
+        public async Task<BookingResponse> GetBookingById(Guid id)
+        {
+            var booking = await bookingRepository.GetByIdAsync(id)
+                                .Include(x => x.BookedRooms).ThenInclude(x => x.Room).ThenInclude(x => x.RoomFacilities).ThenInclude(x => x.Facility)
+                                .Include(x => x.BookedRooms).ThenInclude(x => x.Room).ThenInclude(x => x.RoomServices).ThenInclude(x => x.Service)
+                                .FirstOrDefaultAsync();
+            if (booking != null)
+            {
+                var res = mapper.Map<BookingResponse>(booking);
+                if (booking.UserId != null)
+                {
+                    var customer = await accountRepository.GetUserById(booking.UserId);
+                    res.User = mapper.Map<UserModel>(customer);
+                }
+                return res;
+            }
+            return default;
         }
 
         private double CalculateFee(IEnumerable<Guid> roomIds)
