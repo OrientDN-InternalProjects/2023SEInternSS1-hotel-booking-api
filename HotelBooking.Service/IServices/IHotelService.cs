@@ -6,7 +6,11 @@ namespace HotelBooking.Service.IServices
     public interface IHotelService
     {
         Task<Guid> AddHotelAsync(HotelRequest model);
+        Task<IEnumerable<HotelModel>> GetAllHotel();
+        Task<bool> UpdateHotel(HotelRequest model, Guid id);
+        Task<bool> DeleteHotel(Guid id);
         Task<IEnumerable<HotelModel>> GetHotelByAddressTypeRoomDuration(FilterHotelRequest model);
+        Task<IEnumerable<RoomVM>> GetAllRoomAvailable(Guid idHotel, DurationVM duration);
         Task<Guid> AddRoomAsync(RoomRequest model);
 
         Task<Guid> AddExtraServiceAsync(ServiceHotelModel model);

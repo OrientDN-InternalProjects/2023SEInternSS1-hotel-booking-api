@@ -82,6 +82,105 @@ namespace HotelBooking.Service.Services
             await unitOfWork.SaveAsync();
             return hotel.Id;
         }
+
+        public async Task<IEnumerable<HotelModel>> GetAllHotel()
+        {
+            var result = await hotelRepository.GetAllHotels()
+                                              .Include(x => x.Address)
+                                              .Include(x => x.Urls).ToListAsync();
+            return mapper.Map<IEnumerable<HotelModel>>(result);
+        }
+
+        public async Task<bool> UpdateHotel(HotelRequest model, Guid id)
+        {
+            var hotel = await hotelRepository.GetByIdAsync(id).FirstOrDefaultAsync();
+            if (hotel == null) return false;
+            hotel.HotelName = model.HotelName;
+            model.Description = model.Description;
+            model.Rating = model.Rating;
+            hotel.UpdatedDate = DateTime.Now;
+            var address = addressRepository.GetByCondition(x => x.Id.Equals(hotel.AddressId)).FirstOrDefault();
+            address = mapper.Map(model.Address, address);
+            address.UpdatedDate = DateTime.Now;
+            addressRepository.Update(address);
+            hotelRepository.UpdateAsync(hotel);
+
+            var listImage = await pictureRepository.GetByCondition(x => x.HotelId.Equals(hotel.Id)).ToListAsync();
+            if (listImage.Any())
+            {
+                foreach (var image in listImage)
+                {
+                    pictureRepository.DeleteImage(image);
+                }
+            }
+
+            if (model.Images != null)
+            {
+                foreach (var i in model.Images)
+                {
+                    var url = await pictureService.UploadImageAsync(i);
+                    var image = new Image
+                    {
+                        ImageUrl = url,
+                        Description = "Lorem ipsum",
+                        CreatedDate = DateTime.Now,
+                        Hotel = hotel
+                    };
+                    pictureRepository.CreateImage(image);
+                }
+            }
+            await unitOfWork.SaveAsync();
+            return true;
+        }
+
+        public async Task<bool> DeleteHotel(Guid id)
+        {
+            var hotel = await hotelRepository.GetByIdAsync(id).FirstOrDefaultAsync();
+            if (hotel == null) return false;
+            hotel.DeletedDate = DateTime.Now;
+            hotel.IsDeleted = true;
+
+            var address = await addressRepository.GetByCondition(x => x.Id.Equals(hotel.AddressId)).FirstOrDefaultAsync();
+            if (address != null)
+            {
+                address.IsDeleted = true;
+                address.DeletedDate = DateTime.Now;
+            }
+
+            var images = await pictureRepository.GetByCondition(x => x.HotelId.Equals(hotel.Id)).ToListAsync();
+            if (images.Any())
+            {
+                foreach (var i in images)
+                {
+                    pictureRepository.Delete(i);
+                }
+            }
+            await unitOfWork.SaveAsync();
+            return true;
+        }
+
+        public async Task<IEnumerable<RoomVM>> GetAllRoomAvailable(Guid idHotel, DurationVM duration)
+        {
+            var rooms = await roomRepository.GetByCondition(x => x.HotelId.Equals(idHotel) && x.IsDeleted == false)
+                                            .Include(x => x.RoomFacilities).ThenInclude(x => x.Facility)
+                                            .Include(x => x.RoomServices).ThenInclude(x => x.Service)
+                                            .ToListAsync();
+            if (rooms.Any())
+            {
+                var returnRooms = new List<Room>();
+                foreach (var i in rooms)
+                {
+                    var checkResult = await checkDurationValidationService.CheckValidationDurationForRoom(duration, i.Id);
+                    if (checkResult == true)
+                    {
+                        returnRooms.Add(i);
+                    }
+                }
+                return mapper.Map<IEnumerable<RoomVM>>(returnRooms);
+            }
+            return default;
+        }
+
         public async Task<Guid> AddRoomAsync(RoomRequest model)
         {
             var priceQuotation = mapper.Map<PriceQuotation>(model.Price);
