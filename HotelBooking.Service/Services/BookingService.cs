@@ -55,7 +55,7 @@ namespace HotelBooking.Service.Services
             bookingRepository.CreateAsync(booking);
             foreach (var i in model.RoomIds)
             {
-                var room = await roomRepository.GetByIdAsync(i);
+                var room = await roomRepository.GetByIdAsync(i).FirstOrDefaultAsync();
                 if (room == null)
                     return new ResponseModel
                     {
@@ -181,7 +181,7 @@ namespace HotelBooking.Service.Services
             {
                 var bookedRoom = new BookedRoom()
                 {
-                    Room = await roomRepository.GetByIdAsync(i),
+                    Room = await roomRepository.GetByIdAsync(i).FirstOrDefaultAsync(),
                     Booking = booking,
                     From = booking.From,
                     To = booking.To

@@ -242,5 +242,25 @@ namespace HotelBooking.API.Controllers
                     IsSuccess = true
                 });
         }
+
+        [HttpGet("get-hotel-by-id")]
+        public async Task<IActionResult> GetHotelById(Guid id)
+        {
+            var result = await hotelService.GetHotelByIdAsync(id);
+            return result != null ?
+                StatusCode(StatusCodes.Status200OK, new ResponseModel { StatusCode = HttpStatusCode.OK, IsSuccess = true, Data = new { data = result, } })
+                : StatusCode(StatusCodes.Status404NotFound, new ResponseModel { StatusCode = HttpStatusCode.NotFound, IsSuccess = false });
+        }
+
+        [HttpGet("get-room-by-id")]
+        public async Task<IActionResult> GetRoomById(Guid id)
+        {
+            var result = await hotelService.GetRoomByIdAsync(id);
+            return (result != null) ?
+                StatusCode(StatusCodes.Status200OK, new ResponseModel
+                { StatusCode = HttpStatusCode.OK, IsSuccess = true, Data = new { data = result, } })
+                : StatusCode(StatusCodes.Status404NotFound, new ResponseModel { StatusCode = HttpStatusCode.NotFound, IsSuccess = false });
+        }
+
     }
 }
