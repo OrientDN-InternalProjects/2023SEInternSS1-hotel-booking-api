@@ -3,6 +3,7 @@ using HotelBooking.Data.DTOs.Hotel;
 using HotelBooking.Data.Helpers;
 using HotelBooking.Data.Infrastructure;
 using HotelBooking.Data.Interfaces;
+using HotelBooking.Data.Repositories;
 using HotelBooking.Data.ViewModel;
 using HotelBooking.Model.Entities;
 using HotelBooking.Service.IServices;
@@ -186,7 +187,7 @@ namespace HotelBooking.Service.Services
 
         public async Task<bool> AddServiceAndFacilityToRoomAsync(EquipRoomRequest model)
         {
-            var room = await roomRepository.GetByIdAsync(model.RoomId);
+            var room = await roomRepository.GetByIdAsync(model.RoomId).FirstOrDefaultAsync();
             if (room == null) return false;
             if (model.FacilityIds != null)
             {
@@ -253,6 +254,33 @@ namespace HotelBooking.Service.Services
             return mapper.Map<IEnumerable<HotelModel>>(hotels);
         }
 
+        public async Task<HotelModel> GetHotelByIdAsync(Guid id)
+        {
+            var result = await hotelRepository.GetByIdAsync(id)
+                                      .Include(x => x.Address)
+                                      .Include(x => x.Urls)
+                                      .Include(x => x.Rooms).ThenInclude(x => x.RoomFacilities).ThenInclude(x => x.Facility)
+                                      .Include(x => x.Rooms).ThenInclude(x => x.RoomServices).ThenInclude(x => x.Service)
+                                      .FirstOrDefaultAsync();
+            if (result != null)
+            {
+                return mapper.Map<HotelModel>(result);
+            }
+            return default;
+        }
+
+        public async Task<RoomVM> GetRoomByIdAsync(Guid id)
+        {
+            var room = await roomRepository.GetByIdAsync(id)
+                            .Include(x => x.RoomFacilities).ThenInclude(x => x.Facility)
+                            .Include(x => x.RoomServices).ThenInclude(x => x.Service)
+                            .FirstOrDefaultAsync();
+            if (room != null)
+            {
+                return mapper.Map<RoomVM>(room);
+            }
+            return default;
+        }
         public async Task<IEnumerable<HotelModel>> GetHotelByName(string name)
         {
             var dataSet = hotelRepository.GetAllHotels();
@@ -268,6 +296,8 @@ namespace HotelBooking.Service.Services
             }
             return default;
         }
+    }
 
-    }  
-}
+
+}  
+

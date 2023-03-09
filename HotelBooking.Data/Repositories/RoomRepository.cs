@@ -26,9 +26,9 @@ namespace HotelBooking.Data.Repositories
             return await GetAll().OrderBy(x => x.Id).Where(x => x.IsDeleted == false).ToListAsync();
         }
 
-        public async Task<Room> GetByIdAsync(Guid id)
+        public IQueryable<Room> GetByIdAsync(Guid id)
         {
-            return await GetByCondition(x => x.Id.Equals(id) && x.IsDeleted == false).FirstOrDefaultAsync();
+            return GetByCondition(x => x.Id.Equals(id) && x.IsDeleted == false);
         }
 
         public void UpdateAsync(Room room)
