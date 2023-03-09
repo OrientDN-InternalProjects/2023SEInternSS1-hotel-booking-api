@@ -102,6 +102,41 @@ namespace HotelBooking.Service.Services
             return service.Id;
         }
 
+        public async Task<ServiceHotelModel> GetExtraServiceById(Guid id)
+        {
+            var service = await serviceHotelRepository.GetByIdAsync(id);
+            return mapper.Map<ServiceHotelModel>(service);
+        }
+
+        public async Task<IEnumerable<ServiceHotelModel>> GetAllExtraService()
+        {
+            var services = await serviceHotelRepository.GetAllAsync();
+            return mapper.Map<IEnumerable<ServiceHotelModel>>(services);
+        }
+
+        public async Task<bool> UpdateExtraService(ServiceHotelModel model)
+        {
+            if(model.Id == null) return false;
+            var service = await serviceHotelRepository.GetByIdAsync(model.Id);
+            if (service == null) return false;
+            service.ServicePrice = model.ServicePrice;
+            service.ServiceName = model.ServiceName;
+            service.UpdatedDate = DateTime.Now;
+            serviceHotelRepository.UpdateAsync(service);
+            await unitOfWork.SaveAsync();
+            return true;
+        }
+
+        public async Task<bool> DeleteExtraService(Guid id)
+        {
+            var service = await serviceHotelRepository.GetByIdAsync(id);
+            if (service == null) return false;
+            service.DeletedDate = DateTime.Now;
+            service.IsDeleted = true;
+            await unitOfWork.SaveAsync();
+            return true;
+        }
+
         public async Task<Guid> AddFacilityAsync(FacilityModel model)
         {
             var facility = mapper.Map<Facility>(model);
@@ -218,5 +253,21 @@ namespace HotelBooking.Service.Services
             return mapper.Map<IEnumerable<HotelModel>>(hotels);
         }
 
-    }
+        public async Task<IEnumerable<HotelModel>> GetHotelByName(string name)
+        {
+            var dataSet = hotelRepository.GetAllHotels();
+            var result = await dataSet.ApplyFilterByName(name)
+                                      .Include(x => x.Address)
+                                      .Include(x => x.Urls)
+                                      .Include(x => x.Rooms).ThenInclude(x => x.RoomFacilities).ThenInclude(x => x.Facility)
+                                      .Include(x => x.Rooms).ThenInclude(x => x.RoomServices).ThenInclude(x => x.Service)
+                                      .ToListAsync();
+            if (result.Any())
+            {
+                return mapper.Map<IEnumerable<HotelModel>>(result);
+            }
+            return default;
+        }
+
+    }  
 }

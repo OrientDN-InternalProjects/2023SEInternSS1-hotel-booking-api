@@ -68,6 +68,20 @@ namespace HotelBooking.API.Controllers
             });
         }
 
+        [HttpGet("get-hotel-by-name")]
+        public async Task<IActionResult> GetHotelByNameAsync(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                logger.LogError("Invalid name fo find");
+                return BadRequest("Invalid model object");
+            }
+            var result = await hotelService.GetHotelByName(name);
+            return result != null ?
+                 StatusCode(StatusCodes.Status200OK, new ResponseModel { StatusCode = HttpStatusCode.OK, IsSuccess = true, Data = new { data = result, } })
+                : StatusCode(StatusCodes.Status404NotFound, new ResponseModel { StatusCode = HttpStatusCode.NotFound, IsSuccess = false });
+        }
+
         [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
         [HttpPost("create-room")]
         public async Task<IActionResult> CreateRoomAsync([FromForm] RoomRequest model)
@@ -165,6 +179,49 @@ namespace HotelBooking.API.Controllers
                 },
                 IsSuccess = true
             });
+        }
+
+        [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+        [HttpPut("update-service")]
+        public async Task<IActionResult> UpdateServiceAsync(ServiceHotelModel model)
+        {
+            if (model == null)
+            {
+                logger.LogError("Invalid model sent from client.");
+                return BadRequest("Invalid model object");
+            }
+            var result = await hotelService.UpdateExtraService(model);
+            return result ?
+                StatusCode(StatusCodes.Status200OK, new ResponseModel { StatusCode = HttpStatusCode.OK, IsSuccess = true })
+                : StatusCode(StatusCodes.Status400BadRequest, new ResponseModel { StatusCode = HttpStatusCode.BadRequest, IsSuccess = false });
+        }
+
+        [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+        [HttpDelete("delete-service")]
+        public async Task<IActionResult> DeleteExtraService(Guid id)
+        {
+            var result = await hotelService.DeleteExtraService(id);
+            return result ?
+                StatusCode(StatusCodes.Status200OK, new ResponseModel { StatusCode = HttpStatusCode.OK, IsSuccess = true, Data = new { Guid = id } })
+                : StatusCode(StatusCodes.Status400BadRequest, new ResponseModel { StatusCode = HttpStatusCode.BadRequest, IsSuccess = false });
+        }
+
+        [HttpGet("get-all-services")]
+        public async Task<IActionResult> GetAllServices()
+        {
+            var result = await hotelService.GetAllExtraService();
+            return (result != null) ?
+                StatusCode(StatusCodes.Status200OK, new ResponseModel { StatusCode = HttpStatusCode.OK, IsSuccess = true, Data = result })
+                : StatusCode(StatusCodes.Status404NotFound, new ResponseModel { StatusCode = HttpStatusCode.NotFound, IsSuccess = false });
+        }
+
+        [HttpGet("get-service-by-id")]
+        public async Task<IActionResult> GetServiceById(Guid id)
+        {
+            var result = await hotelService.GetExtraServiceById(id);
+            return (result != null) ?
+                StatusCode(StatusCodes.Status200OK, new ResponseModel { StatusCode = HttpStatusCode.OK, IsSuccess = true, Data = result })
+                : StatusCode(StatusCodes.Status404NotFound, new ResponseModel { StatusCode = HttpStatusCode.NotFound, IsSuccess = false });
         }
 
         [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
