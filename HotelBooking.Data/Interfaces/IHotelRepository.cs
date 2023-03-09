@@ -6,10 +6,10 @@ namespace HotelBooking.Data.Interfaces
     public interface IHotelRepository
     {
         Task<IEnumerable<Hotel>> GetAllAsync();
-        Task<Hotel> GetByIdAsync(Guid hotelId);
+        IQueryable<Hotel> GetByIdAsync(Guid hotelId);
         void CreateAsync(Hotel hotel);
         void UpdateAsync(Hotel hotel);
         void DeleteAsync(Hotel hotel);
-        Task<IEnumerable<HotelVM>> GetByNameAync(string name);
+        IQueryable<Hotel> GetAllHotels();
     }
 }

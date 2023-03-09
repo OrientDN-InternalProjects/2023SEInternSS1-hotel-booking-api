@@ -13,7 +13,9 @@ namespace HotelBooking.Data.Helpers
     {
         public BookingHelper()
         {
-            CreateMap<BookingVM,Booking>().ReverseMap();
+            //CreateMap<BookingRequest, Booking>().ReverseMap();
+            //CreateMap<Booking, BookingResponse>()
+            //    .ForPath(desc => desc.Rooms, opt => opt.MapFrom(src => src.BookedRooms.Select(x => x.Room)));
         }
     }
 }
