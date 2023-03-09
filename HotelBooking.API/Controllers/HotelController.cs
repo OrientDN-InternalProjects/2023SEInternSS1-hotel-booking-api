@@ -105,6 +105,26 @@ namespace HotelBooking.API.Controllers
         }
 
         [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+        [HttpPut("update-equip-room")]
+        public async Task<IActionResult> UpdateEquipRoomAsync(EquipRoomRequest model)
+        {
+            var result = await hotelService.UpdateRoomEquipment(model);
+            return result ?
+                StatusCode(StatusCodes.Status200OK, new ResponseModel { StatusCode = HttpStatusCode.OK, IsSuccess = true, Data = new { Guid = model.RoomId } })
+                : StatusCode(StatusCodes.Status400BadRequest, new ResponseModel { StatusCode = HttpStatusCode.BadRequest, IsSuccess = false });
+        }
+
+        [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+        [HttpDelete("delete-room")]
+        public async Task<IActionResult> DeleteRoom(Guid id)
+        {
+            var result = await hotelService.DeleteRoom(id);
+            return result ?
+                StatusCode(StatusCodes.Status200OK, new ResponseModel { StatusCode = HttpStatusCode.OK, IsSuccess = true, Data = new { Guid = id } })
+                : StatusCode(StatusCodes.Status400BadRequest, new ResponseModel { StatusCode = HttpStatusCode.BadRequest, IsSuccess = false });
+        }
+
+        [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
         [HttpPost("create-facility")]
         public async Task<IActionResult> CreateFacilityAsync([FromForm] FacilityModel model)
         {
