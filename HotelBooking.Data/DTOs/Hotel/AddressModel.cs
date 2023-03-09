@@ -2,8 +2,9 @@
 
 namespace HotelBooking.Data.DTOs
 {
-    public class AddressRequest
+    public class AddressModel
     {
+        public Guid? Id { get; set; }
         [StringLength(250)]
         public string City { get; set; }
 

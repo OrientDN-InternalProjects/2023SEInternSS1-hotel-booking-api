@@ -160,10 +160,11 @@ namespace HotelBooking.Service.Services
             return true;
         }
 
-        public async Task<IEnumerable<HotelVM>> SearchHotelByName(string name)
+        public async Task<IEnumerable<HotelModel>> SearchHotelByName(string name)
         {
-            var result = await hotelRepository.GetByNameAync(name);
-            return result;
+            //var result = await hotelRepository.GetByNameAync(name);
+            //return result;
+            return default;
         }
 
         public async Task<bool> UpdateBookingAsync(BookingVM model, Guid Id)

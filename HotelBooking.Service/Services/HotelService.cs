@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
 using HotelBooking.Data.DTOs.Hotel;
+using HotelBooking.Data.Helpers;
 using HotelBooking.Data.Infrastructure;
 using HotelBooking.Data.Interfaces;
+using HotelBooking.Data.ViewModel;
 using HotelBooking.Model.Entities;
 using HotelBooking.Service.IServices;
+using Microsoft.EntityFrameworkCore;
 
 namespace HotelBooking.Service.Services
 {
@@ -13,6 +16,7 @@ namespace HotelBooking.Service.Services
         private readonly IAddressRepository addressRepository;
         private readonly IPictureRepository pictureRepository;
         private readonly IPictureService pictureService;
+        private readonly ICheckDurationValidationService checkDurationValidationService;
 
         private readonly IPriceQuotationRepository priceQuotationRepository;
         private readonly IServiceHotelRepository serviceHotelRepository;
@@ -28,7 +32,7 @@ namespace HotelBooking.Service.Services
             IPriceQuotationRepository priceQuotationRepository, IServiceHotelRepository serviceHotelRepository,
             IFacilityRepository facilityRepository, IRoomRepository roomRepository,
             IRoomService roomServiceRepository, IRoomFacility roomFacilityRepository,
-            IMapper mapper, IUnitOfWork unitOfWork)
+            IMapper mapper, IUnitOfWork unitOfWork, ICheckDurationValidationService checkDurationValidationService)
         {
             this.hotelRepository = hotelRepository;
             this.addressRepository = addressRepository;
@@ -42,6 +46,7 @@ namespace HotelBooking.Service.Services
             this.roomRepository = roomRepository;
             this.roomFacilityRepository = roomFacilityRepository;
             this.roomServiceRepository = roomServiceRepository;
+            this.checkDurationValidationService = checkDurationValidationService;
         }
 
         public async Task<Guid> AddHotelAsync(HotelRequest model)
@@ -88,7 +93,7 @@ namespace HotelBooking.Service.Services
             return room.Id;
         }
 
-        public async Task<Guid> AddExtraServiceAsync(ServiceHotelRequest model)
+        public async Task<Guid> AddExtraServiceAsync(ServiceHotelModel model)
         {
             var service = mapper.Map<ExtraService>(model);
             service.CreatedDate = DateTime.Now;
@@ -97,7 +102,7 @@ namespace HotelBooking.Service.Services
             return service.Id;
         }
 
-        public async Task<Guid> AddFacilityAsync(FacilityRequest model)
+        public async Task<Guid> AddFacilityAsync(FacilityModel model)
         {
             var facility = mapper.Map<Facility>(model);
             facility.CreatedDate = DateTime.Now;
@@ -144,5 +149,35 @@ namespace HotelBooking.Service.Services
             await unitOfWork.SaveAsync();
             return true;
         }
+
+        public async Task<IEnumerable<HotelModel>> GetHotelByAddressTypeRoomDuration(FilterHotelRequest model)
+        {
+            var dataSet = hotelRepository.GetAllHotels();
+            var result = await dataSet.ApplyFilterByAddress(model.City)
+                                      .ApplyFilterByRoomType(model.RoomType)
+                                      .Include(x => x.Address)
+                                      .Include(x => x.Urls)
+                                      .Include(x => x.Rooms).ThenInclude(x => x.RoomFacilities).ThenInclude(x => x.Facility)
+                                      .Include(x => x.Rooms).ThenInclude(x => x.RoomServices).ThenInclude(x => x.Service)
+                                      .ToListAsync();
+            if (!result.Any()) return default;
+            var hotels = new List<Hotel>();
+            foreach (var hotel in result)
+            {
+                var rooms = await roomRepository.GetByCondition(x => x.HotelId.Equals(hotel.Id) && x.RoomType == model.RoomType).ToListAsync();
+                if (!rooms.Any()) break;
+                foreach (var room in rooms)
+                {
+                    var checkResult = await checkDurationValidationService.CheckValidationDurationForRoom(model.Duration, room.Id);
+                    if (checkResult)
+                    {
+                        hotels.Add(hotel);
+                        break;
+                    }
+                }
+            }
+            return mapper.Map<IEnumerable<HotelModel>>(hotels);
+        }
+
     }
 }

@@ -43,6 +43,31 @@ namespace HotelBooking.API.Controllers
 
         }
 
+        [HttpPost("fiters-hotel")]
+        public async Task<IActionResult> FilterHotel(FilterHotelRequest filter)
+        {
+
+            var result = await hotelService.GetHotelByAddressTypeRoomDuration(filter);
+            if (result.Any())
+            {
+                return StatusCode(StatusCodes.Status200OK, new ResponseModel
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Data = new
+                    {
+                        hotel = result
+                    },
+                    IsSuccess = true
+
+                });
+            }
+            return StatusCode(StatusCodes.Status404NotFound, new ResponseModel
+            {
+                StatusCode = HttpStatusCode.NotFound,
+                IsSuccess = false
+            });
+        }
+
         [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
         [HttpPost("create-room")]
         public async Task<IActionResult> CreateRoomAsync([FromForm] RoomRequest model)
@@ -67,7 +92,7 @@ namespace HotelBooking.API.Controllers
 
         [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
         [HttpPost("create-facility")]
-        public async Task<IActionResult> CreateFacilityAsync([FromForm] FacilityRequest model)
+        public async Task<IActionResult> CreateFacilityAsync([FromForm] FacilityModel model)
         {
             if (model == null)
             {
@@ -89,7 +114,7 @@ namespace HotelBooking.API.Controllers
 
         [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
         [HttpPost("create-service")]
-        public async Task<IActionResult> CreateServiceAsync([FromForm] ServiceHotelRequest model)
+        public async Task<IActionResult> CreateServiceAsync([FromForm] ServiceHotelModel model)
         {
             if (model == null)
             {

@@ -1,7 +1,9 @@
 ﻿using HotelBooking.Common.Base;
+using HotelBooking.Data.DTOs.Hotel;
 using HotelBooking.Data.Extensions;
 using HotelBooking.Data.ViewModel;
 using HotelBooking.Service.IServices;
+using HotelBooking.Service.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -44,6 +46,7 @@ namespace HotelBooking.API.Controllers
             }
             return Ok(res);
         }
+
 
         [HttpPost("create-booking")]
         public async Task<IActionResult> CreateBookingAsync([FromForm] BookingVM model)
