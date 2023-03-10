@@ -1,4 +1,6 @@
-﻿using HotelBooking.Data.DTOs.Hotel;
+﻿using HotelBooking.Common.Models;
+using HotelBooking.Data.DTOs.Booking;
+using HotelBooking.Data.DTOs.Hotel;
 using HotelBooking.Data.ViewModel;
 
 namespace HotelBooking.Service.IServices
@@ -7,8 +9,10 @@ namespace HotelBooking.Service.IServices
     {
         Task<Guid> AddHotelAsync(HotelRequest model);
         Task<IEnumerable<HotelModel>> GetAllHotel();
+        Task<PagedList<HotelModel>> GetHotelPagedList(PagedListRequest request);
         Task<bool> UpdateHotel(HotelRequest model, Guid id);
         Task<bool> DeleteHotel(Guid id);
+
         Task<IEnumerable<HotelModel>> GetHotelByAddressTypeRoomDuration(FilterHotelRequest model);
         Task<IEnumerable<RoomVM>> GetAllRoomAvailable(Guid idHotel, DurationVM duration);
         Task<Guid> AddRoomAsync(RoomRequest model);

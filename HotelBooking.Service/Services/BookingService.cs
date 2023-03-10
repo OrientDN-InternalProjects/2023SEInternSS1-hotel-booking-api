@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using HotelBooking.Common.Base;
+using HotelBooking.Common.Models;
 using HotelBooking.Data.DTOs.Booking;
 using HotelBooking.Data.Extensions;
 using HotelBooking.Data.Infrastructure;
@@ -162,6 +163,17 @@ namespace HotelBooking.Service.Services
                 return res;
             }
             return default;
+        }
+
+        public async Task<PagedList<BookingResponse>> GetBookingPagedList(PagedListRequest request)
+        {
+            var allBookings = await bookingRepository.GetAllBookings()
+                           .Include(x => x.BookedRooms).ThenInclude(x => x.Room).ThenInclude(x => x.RoomFacilities).ThenInclude(x => x.Facility)
+                           .Include(x => x.BookedRooms).ThenInclude(x => x.Room).ThenInclude(x => x.RoomServices).ThenInclude(x => x.Service)
+                           .ToListAsync();
+            var returnObjects = mapper.Map<IEnumerable<BookingResponse>>(allBookings);
+            var bookings = PagedList<BookingResponse>.ToPagedList(returnObjects.AsQueryable(), request.PageNumber, request.PageSize);
+            return bookings;
         }
 
         private double CalculateFee(IEnumerable<Guid> roomIds)

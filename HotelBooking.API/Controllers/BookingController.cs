@@ -5,6 +5,7 @@ using HotelBooking.Data.ViewModel;
 using HotelBooking.Service.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Net;
 
 namespace HotelBooking.API.Controllers
@@ -164,6 +165,13 @@ namespace HotelBooking.API.Controllers
                 StatusCode = HttpStatusCode.NotFound,
                 IsSuccess = false
             });
+        }
+
+        [HttpGet("get-all-booking-paged-list")]
+        public async Task<IActionResult> GetAllBookingPagedList([FromQuery] PagedListRequest request)
+        {
+            var bookings = await bookingService.GetBookingPagedList(request);
+            return Ok(bookings);
         }
     }
 }

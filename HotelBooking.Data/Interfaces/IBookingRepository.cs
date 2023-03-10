@@ -6,6 +6,7 @@ namespace HotelBooking.Data.Interfaces
     public interface IBookingRepository : IGenericRepository<Booking>
     {
         Task<IEnumerable<Booking>> GetAllAsync();
+        IQueryable<Booking> GetAllBookings();
         IQueryable<Booking> GetByIdAsync(Guid id);
         IQueryable<Booking> GetByUserEmail(string email);
         void CreateAsync(Booking booking);
