@@ -1,5 +1,6 @@
 ﻿using HotelBooking.Common.Base;
 using HotelBooking.Data.DTOs.Hotel;
+using HotelBooking.Data.ViewModel;
 using HotelBooking.Service.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -41,6 +42,99 @@ namespace HotelBooking.API.Controllers
                 IsSuccess = true
             });
 
+        }
+
+        [HttpGet("all-hotels")]
+        public async Task<IActionResult> GetAllHotels()
+        {
+            var result = await hotelService.GetAllHotel();
+            if (result.Any())
+            {
+                return StatusCode(StatusCodes.Status200OK, new ResponseModel
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    IsSuccess = true,
+                    Data = result
+                });
+            }
+            return StatusCode(StatusCodes.Status404NotFound, new ResponseModel
+            {
+                StatusCode = HttpStatusCode.NotFound,
+                IsSuccess = false
+            });
+        }
+
+        [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+        [HttpPut("update-hotel")]
+        public async Task<IActionResult> UpdateHotelAsync([FromForm] HotelRequest model, Guid id)
+        {
+            if (model == null)
+            {
+                logger.LogError("Invalid model sent from client.");
+                return BadRequest("Invalid model object");
+            }
+            var result = await hotelService.UpdateHotel(model, id);
+            if (result)
+            {
+                return StatusCode(StatusCodes.Status200OK, new ResponseModel
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    IsSuccess = true,
+                    Data = new
+                    {
+                        Guid = id
+                    }
+                });
+            }
+            return StatusCode(StatusCodes.Status400BadRequest, new ResponseModel
+            {
+                StatusCode = HttpStatusCode.BadRequest,
+                IsSuccess = false
+            });
+        }
+
+        [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+        [HttpDelete("delete-hotel")]
+        public async Task<IActionResult> DeleteHotel(Guid id)
+        {
+            var result = await hotelService.DeleteHotel(id);
+            if (result)
+            {
+                return StatusCode(StatusCodes.Status200OK, new ResponseModel
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    IsSuccess = true,
+                    Data = new
+                    {
+                        Guid = id
+                    }
+                });
+            }
+            return StatusCode(StatusCodes.Status400BadRequest, new ResponseModel
+            {
+                StatusCode = HttpStatusCode.BadRequest,
+                IsSuccess = false
+            });
+        }
+
+        [HttpPost("get-all-rooms-available")]
+        public async Task<IActionResult> GetAllRoomsAvailable(Guid idHotel, DurationVM duration)
+        {
+            var result = await hotelService.GetAllRoomAvailable(idHotel, duration);
+            if (result != null)
+            {
+                return StatusCode(StatusCodes.Status200OK, new ResponseModel
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    IsSuccess = true,
+                    Data = result
+                });
+            }
+            return StatusCode(StatusCodes.Status404NotFound, new ResponseModel
+            {
+                StatusCode = HttpStatusCode.NotFound,
+                IsSuccess = false
+            });
         }
 
         [HttpPost("fiters-hotel")]
