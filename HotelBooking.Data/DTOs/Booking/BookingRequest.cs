@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using HotelBooking.Data.ViewModel;
 
-namespace HotelBooking.Data.ViewModel
+namespace HotelBooking.Data.DTOs.Booking
 {
-    public class BookingVM
+    public class BookingRequest
     {
         public IEnumerable<Guid> RoomIds { get; set; }
         public bool? PaymentStatus { get; set; }
