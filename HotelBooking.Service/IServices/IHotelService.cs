@@ -12,6 +12,8 @@ namespace HotelBooking.Service.IServices
         Task<IEnumerable<HotelModel>> GetHotelByAddressTypeRoomDuration(FilterHotelRequest model);
         Task<IEnumerable<RoomVM>> GetAllRoomAvailable(Guid idHotel, DurationVM duration);
         Task<Guid> AddRoomAsync(RoomRequest model);
+        Task<bool> UpdateRoomEquipment(EquipRoomRequest model);
+        Task<bool> DeleteRoom(Guid id);
 
         Task<Guid> AddExtraServiceAsync(ServiceHotelModel model);
         Task<ServiceHotelModel> GetExtraServiceById(Guid id);

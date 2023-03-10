@@ -193,6 +193,89 @@ namespace HotelBooking.Service.Services
             return room.Id;
         }
 
+        public async Task<bool> UpdateRoomEquipment(EquipRoomRequest model)
+        {
+            var room = await roomRepository.GetByIdAsync(model.RoomId).FirstOrDefaultAsync();
+            if (room == null) return false;
+            var services = await roomServiceRepository.GetByCondition(x => x.RoomId.Equals(model.RoomId)).ToListAsync();
+            if (services.Any())
+            {
+                foreach (var i in services)
+                {
+                    roomServiceRepository.Delete(i);
+                }
+            }
+            var facilities = await roomFacilityRepository.GetByCondition(x => x.RoomId.Equals(model.RoomId)).ToListAsync();
+            if (facilities.Any())
+            {
+                foreach (var i in facilities)
+                {
+                    roomFacilityRepository.Delete(i);
+                }
+            }
+            if (model.FacilityIds != null)
+            {
+                foreach (var i in model.FacilityIds)
+                {
+                    var item = await facilityRepository.GetFacilityByIdAsync(new Guid(i));
+                    if (item != null)
+                    {
+                        var roomFacility = new RoomFacility()
+                        {
+                            Room = room,
+                            Facility = item
+                        };
+                        roomFacilityRepository.CreateAsync(roomFacility);
+                    }
+                }
+            }
+
+            if (model.ServiceIds != null)
+            {
+                foreach (var i in model.ServiceIds)
+                {
+                    var item = await serviceHotelRepository.GetByIdAsync(new Guid(i));
+                    if (item != null)
+                    {
+                        var roomService = new RoomService()
+                        {
+                            Room = room,
+                            Service = item
+                        };
+                        roomServiceRepository.CreateAsync(roomService);
+                    }
+                }
+            }
+            await unitOfWork.SaveAsync();
+            return true;
+        }
+
+        public async Task<bool> DeleteRoom(Guid id)
+        {
+            var room = await roomRepository.GetByIdAsync(id).FirstOrDefaultAsync();
+            if (room == null) return false;
+            room.IsDeleted = true;
+            room.DeletedDate = DateTime.Now;
+            var services = await roomServiceRepository.GetByCondition(x => x.RoomId.Equals(id)).ToListAsync();
+            if (services.Any())
+            {
+                foreach (var i in services)
+                {
+                    roomServiceRepository.Delete(i);
+                }
+            }
+            var facilities = await roomFacilityRepository.GetByCondition(x => x.RoomId.Equals(id)).ToListAsync();
+            if (facilities.Any())
+            {
+                foreach (var i in facilities)
+                {
+                    roomFacilityRepository.Delete(i);
+                }
+            }
+            await unitOfWork.SaveAsync();
+            return true;
+        }
+
         public async Task<Guid> AddExtraServiceAsync(ServiceHotelModel model)
         {
             var service = mapper.Map<ExtraService>(model);
@@ -395,6 +478,8 @@ namespace HotelBooking.Service.Services
             }
             return default;
         }
+
+
     }
 
 
