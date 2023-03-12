@@ -5,6 +5,7 @@ namespace HotelBooking.Data.ViewModel
 {
     public class RoomVM
     {
+        public Guid? Id { get; set; }
         public RoomType? RoomType { get; set; }
         public string Description { get; set; }
         public IEnumerable<ServiceHotelModel> ExtraServices { get; set; }

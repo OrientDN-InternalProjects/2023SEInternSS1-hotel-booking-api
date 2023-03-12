@@ -1,4 +1,5 @@
 ﻿using HotelBooking.Common.Base;
+using HotelBooking.Common.Models;
 using HotelBooking.Data.DTOs.Booking;
 using HotelBooking.Data.ViewModel;
 
@@ -11,5 +12,6 @@ namespace HotelBooking.Service.IServices
         Task<bool> DeleteBookingAsync(Guid id);
         Task<BookingResponse> GetBookingById(Guid id);
         Task<IEnumerable<BookingResponse>> GetAllBookingsByUser(string email);
+        Task<PagedList<BookingResponse>> GetBookingPagedList(PagedListRequest request);
     }
 }

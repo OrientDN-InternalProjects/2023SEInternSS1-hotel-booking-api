@@ -1,9 +1,11 @@
 ﻿using HotelBooking.Common.Base;
+using HotelBooking.Data.DTOs.Booking;
 using HotelBooking.Data.DTOs.Hotel;
 using HotelBooking.Data.ViewModel;
 using HotelBooking.Service.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Net;
 
 namespace HotelBooking.API.Controllers
@@ -167,7 +169,8 @@ namespace HotelBooking.API.Controllers
         {
             if (string.IsNullOrEmpty(name))
             {
-                return BadRequest("Invalid model object");
+                var allHotels = await hotelService.GetAllHotel();
+                return Ok(allHotels);
             }
             var result = await hotelService.GetHotelByName(name);
             return result != null ?
@@ -353,6 +356,13 @@ namespace HotelBooking.API.Controllers
                 StatusCode(StatusCodes.Status200OK, new ResponseModel
                 { StatusCode = HttpStatusCode.OK, IsSuccess = true, Data = new { data = result, } })
                 : StatusCode(StatusCodes.Status404NotFound, new ResponseModel { StatusCode = HttpStatusCode.NotFound, IsSuccess = false });
+        }
+
+        [HttpGet("get-all-hotel-paged-list")]
+        public async Task<IActionResult> GetAllHotelPagedList([FromQuery] PagedListRequest request)
+        {
+            var hotels = await hotelService.GetHotelPagedList(request);
+            return Ok(hotels);
         }
 
     }

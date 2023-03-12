@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using HotelBooking.Common.Models;
+using HotelBooking.Data.DTOs.Booking;
 using HotelBooking.Data.DTOs.Hotel;
 using HotelBooking.Data.Helpers;
 using HotelBooking.Data.Infrastructure;
@@ -479,7 +481,18 @@ namespace HotelBooking.Service.Services
             return default;
         }
 
-
+        public async Task<PagedList<HotelModel>> GetHotelPagedList(PagedListRequest request)
+        {
+            var allHotels = await hotelRepository.GetAllHotels()
+                                      .Include(x => x.Address)
+                                      .Include(x => x.Urls)
+                                      .Include(x => x.Rooms).ThenInclude(x => x.RoomFacilities).ThenInclude(x => x.Facility)
+                                      .Include(x => x.Rooms).ThenInclude(x => x.RoomServices).ThenInclude(x => x.Service)
+                                      .ToListAsync();
+            var returnObjects = mapper.Map<IEnumerable<HotelModel>>(allHotels);
+            var hotels = PagedList<HotelModel>.ToPagedList(returnObjects.AsQueryable(), request.PageNumber, request.PageSize);
+            return hotels;
+        }
     }
 
 

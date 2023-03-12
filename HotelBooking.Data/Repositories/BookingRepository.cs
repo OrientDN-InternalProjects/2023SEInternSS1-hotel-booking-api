@@ -26,6 +26,10 @@ namespace HotelBooking.Data.Repositories
             return await GetAll().OrderBy(b => b.Id).Where(b => b.IsDeleted == false).ToListAsync();
         }
 
+        public IQueryable<Booking> GetAllBookings()
+        {
+            return GetAll();
+        }
         public IQueryable<Booking> GetByIdAsync(Guid id)
         {
             return GetByCondition(b => b.Id.Equals(id) && b.IsDeleted == false);
