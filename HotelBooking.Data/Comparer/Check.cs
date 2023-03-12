@@ -25,8 +25,6 @@ namespace HotelBooking.Data.Comparer
                 {
                     times.Add(item.To, false);
                 }
-
-                //times.Add(item.To, false);
             }
             if (DateTime.Compare(newDuration.From.Date, times.ElementAt(times.Count - 1).Key.Date) >= 0)
                 return true;
@@ -41,10 +39,16 @@ namespace HotelBooking.Data.Comparer
                 }
                 return false;
             }
-            if (times.ContainsKey(newDuration.To))
+            if (times.ContainsKey(newDuration.To) && times[newDuration.To] == true)
+            {
+                //return true;
+                times.Remove(newDuration.To);
+            }
+            if (times.ContainsKey(newDuration.To) && times[newDuration.To] == false)
             {
                 return false;
             }
+
             times.Add(newDuration.From, true);
             times.Add(newDuration.To, false);
             int from_index = times.IndexOfKey(newDuration.From);
