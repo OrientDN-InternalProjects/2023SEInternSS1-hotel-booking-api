@@ -5,7 +5,6 @@ using HotelBooking.Data.ViewModel;
 using HotelBooking.Service.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using System.Net;
 
 namespace HotelBooking.API.Controllers
@@ -30,7 +29,7 @@ namespace HotelBooking.API.Controllers
         }
 
         [HttpPost("create-booking")]
-        public async Task<IActionResult> CreateBookingAsync([FromForm] BookingRequest model)
+        public async Task<IActionResult> CreateBookingAsync(BookingRequest model)
         {
             if (model == null)
             {
@@ -45,13 +44,7 @@ namespace HotelBooking.API.Controllers
             var res = await bookingService.AddBookingAsync(model);
 
             return res.IsSuccess == true ?
-                StatusCode(StatusCodes.Status201Created, res) :
-                StatusCode(StatusCodes.Status400BadRequest, new ResponseModel
-                {
-                    StatusCode = HttpStatusCode.BadRequest,
-                    Message = "Created booking failed",
-                    IsSuccess = false
-                });
+                StatusCode(StatusCodes.Status201Created, res) : StatusCode(StatusCodes.Status400BadRequest, res);
         }
 
         [HttpPost("filter-room-by-duration")]

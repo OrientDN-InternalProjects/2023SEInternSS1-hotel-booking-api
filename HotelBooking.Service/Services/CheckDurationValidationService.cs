@@ -17,7 +17,7 @@ namespace HotelBooking.Service.Services
         public async Task<bool> CheckValidationDurationForRoom(DurationVM newDuration, Guid roomId)
         {
             var returnObjects = await bookedRoomRepository.GetAll().Where(x => x.RoomId.Equals(roomId)).Select(x => new DurationVM { From = x.From.Date, To = x.To.Date }).ToListAsync();
-            if(!returnObjects.Any())
+            if (!returnObjects.Any())
             {
                 return true;
             }
@@ -54,10 +54,16 @@ namespace HotelBooking.Service.Services
                 }
                 return false;
             }
-            if (times.ContainsKey(newDuration.To))
+            if (times.ContainsKey(newDuration.To) && times[newDuration.To] == true)
+            {
+                //return true;
+                times.Remove(newDuration.To);
+            }
+            if (times.ContainsKey(newDuration.To) && times[newDuration.To] == false)
             {
                 return false;
             }
+
             times.Add(newDuration.From, true);
             times.Add(newDuration.To, false);
             int from_index = times.IndexOfKey(newDuration.From);

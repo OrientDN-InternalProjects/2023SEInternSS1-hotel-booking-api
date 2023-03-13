@@ -21,6 +21,7 @@ namespace HotelBooking.Service.Services
         private readonly IRoomService roomServiceRepository;
         private readonly IMailSender mailSender;
         private readonly IAccountRepository accountRepository;
+        private readonly ICheckDurationValidationService checkDurationValidationService;
 
         private readonly IMapper mapper;
         private readonly IUnitOfWork unitOfWork;
@@ -28,7 +29,7 @@ namespace HotelBooking.Service.Services
             IBookedRoom bookedRoomRepository, IBookingRepository bookingRepository,
             IRoomRepository roomRepository, IMapper mapper, IUnitOfWork unitOfWork,
             IRoomService roomServiceRepository, IMailSender mailSender,
-            IAccountRepository accountRepository)
+            IAccountRepository accountRepository, ICheckDurationValidationService checkDurationValidationService)
         {
             this.hotelRepository = hotelRepository;
             this.bookedRoomRepository = bookedRoomRepository;
@@ -39,13 +40,21 @@ namespace HotelBooking.Service.Services
             this.roomServiceRepository = roomServiceRepository;
             this.mailSender = mailSender;
             this.accountRepository = accountRepository;
+            this.checkDurationValidationService = checkDurationValidationService;
         }
 
         public async Task<ResponseModel> AddBookingAsync(BookingRequest model)
         {
+            if (DateTime.Compare(model.Duration.From, model.Duration.To) > 0)
+                return new ResponseModel()
+                {
+                    StatusCode = System.Net.HttpStatusCode.BadRequest,
+                    IsSuccess = false,
+                    Message = "Duration you chosen is not valid"
+                };
             var booking = new Booking()
             {
-                PaymentStatus = model.PaymentStatus,
+                PaymentStatus = false,
                 From = model.Duration.From,
                 To = model.Duration.To,
                 Email = model.Email,
@@ -58,6 +67,16 @@ namespace HotelBooking.Service.Services
             bookingRepository.CreateAsync(booking);
             foreach (var i in model.RoomIds)
             {
+                var checkValidation = await checkDurationValidationService.CheckValidationDurationForRoom(model.Duration, i);
+                if (!checkValidation)
+                {
+                    return new ResponseModel
+                    {
+                        StatusCode = System.Net.HttpStatusCode.BadRequest,
+                        IsSuccess = false,
+                        Message = "You can't book at this duration"
+                    };
+                }
                 var room = await roomRepository.GetByIdAsync(i).FirstOrDefaultAsync();
                 if (room == null)
                     return new ResponseModel

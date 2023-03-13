@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using HotelBooking.Common.Base;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using HotelBooking.Common.Base;
 
 namespace HotelBooking.Model.Entities
 {
@@ -14,10 +9,12 @@ namespace HotelBooking.Model.Entities
         public Guid? RoomId { get; set; }
         [ForeignKey("RoomId")]
         public virtual Room Room { get; set; }
-        public Guid? BookingId{ get; set;}
+        public Guid? BookingId { get; set; }
         [ForeignKey("BookingId")]
         public virtual Booking Booking { get; set; }
+        [Column(TypeName = "Date")]
         public DateTime From { get; set; }
+        [Column(TypeName = "Date")]
         public DateTime To { get; set; }
     }
 }
