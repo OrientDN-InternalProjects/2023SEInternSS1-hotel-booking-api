@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace HotelBooking.Data.Repositories
@@ -132,13 +133,16 @@ namespace HotelBooking.Data.Repositories
             if (check)
             {
                 JwtSecurityToken jwtSecurityToken = await CreateJwtToken(existUser);
+                var refreshToken = GenerateRefreshToken();
+                SetRefreshToken(refreshToken, existUser);
                 return new ResponseModel
                 {
                     StatusCode = HttpStatusCode.OK,
                     Message = "Login successfully",
                     Data = new
                     {
-                        token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken)
+                        accessToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
+                        refreshToken = refreshToken.Token
                     },
                     IsSuccess = true
                 };
@@ -225,6 +229,25 @@ namespace HotelBooking.Data.Repositories
                 Errors = string.Join(", ", resetResult.Errors.ToList().Select(e => e.Description)),
                 IsSuccess = false
             };
+        }
+
+        private RefreshToken GenerateRefreshToken()
+        {
+            var refreshToken = new RefreshToken
+            {
+                Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32)),
+                Created = DateTime.Now,
+                Expires = DateTime.Now.AddDays(7)
+            };
+            return refreshToken;
+        }
+
+        private async void SetRefreshToken(RefreshToken refreshToken, User existUser)
+        {
+            existUser.RefreshToken = refreshToken.Token;
+            existUser.TokenCreated = refreshToken.Created;
+            existUser.TokenExpires = refreshToken.Expires;
+            await context.SaveChangesAsync();
         }
 
         private async Task<JwtSecurityToken> CreateJwtToken(User user)
