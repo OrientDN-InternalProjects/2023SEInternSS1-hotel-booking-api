@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using FuzzySharp;
+using HotelBooking.Common.Enums;
 using HotelBooking.Common.Models;
 using HotelBooking.Data.DTOs.Booking;
 using HotelBooking.Data.DTOs.Hotel;
@@ -409,33 +411,51 @@ namespace HotelBooking.Service.Services
             return true;
         }
 
-        public async Task<IEnumerable<HotelModel>> GetHotelByAddressTypeRoomDuration(FilterHotelRequest model)
+        public async Task<IEnumerable<HotelModel>> SearchHotel(string name, DateTime? from, DateTime? to, string city, RoomType? roomType)
         {
+           
             var dataSet = hotelRepository.GetAllHotels();
-            var result = await dataSet.ApplyFilterByAddress(model.City)
-                                      .ApplyFilterByRoomType(model.RoomType)
+            var result = await dataSet.ApplyFilterByAddress(city)
+                                      .ApplyFilterByRoomType(roomType)
                                       .Include(x => x.Address)
                                       .Include(x => x.Urls)
-                                      .Include(x => x.Rooms).ThenInclude(x => x.RoomFacilities).ThenInclude(x => x.Facility)
-                                      .Include(x => x.Rooms).ThenInclude(x => x.RoomServices).ThenInclude(x => x.Service)
                                       .ToListAsync();
             if (!result.Any()) return default;
             var hotels = new List<Hotel>();
-            foreach (var hotel in result)
+
+            if (!string.IsNullOrEmpty(name))
             {
-                var rooms = await roomRepository.GetByCondition(x => x.HotelId.Equals(hotel.Id) && x.RoomType == model.RoomType).ToListAsync();
+                foreach (var item in result)
+                {
+                    if (Fuzz.Ratio(name.ToLower(), item.HotelName.ToLower()) > 50)
+                    {
+                        hotels.Add(item);
+                    }
+                }
+            }
+            else
+            {
+                hotels = result;
+            }
+
+            if (from == null || to  == null) return mapper.Map<IEnumerable<HotelModel>>(hotels);
+            var returnHotels = new List<Hotel>();
+            var newDuration = new DurationVM { From = (DateTime) from, To = (DateTime) to };
+            foreach (var hotel in hotels)
+            {
+                var rooms = await roomRepository.GetByCondition(x => x.HotelId.Equals(hotel.Id) && x.RoomType == roomType).ToListAsync();
                 if (!rooms.Any()) break;
                 foreach (var room in rooms)
                 {
-                    var checkResult = await checkDurationValidationService.CheckValidationDurationForRoom(model.Duration, room.Id);
+                    var checkResult = await checkDurationValidationService.CheckValidationDurationForRoom(newDuration, room.Id);
                     if (checkResult)
                     {
-                        hotels.Add(hotel);
+                        returnHotels.Add(hotel);
                         break;
                     }
                 }
             }
-            return mapper.Map<IEnumerable<HotelModel>>(hotels);
+            return mapper.Map<IEnumerable<HotelModel>>(returnHotels);
         }
 
         public async Task<HotelModel> GetHotelByIdAsync(Guid id)
@@ -462,21 +482,6 @@ namespace HotelBooking.Service.Services
             if (room != null)
             {
                 return mapper.Map<RoomVM>(room);
-            }
-            return default;
-        }
-        public async Task<IEnumerable<HotelModel>> GetHotelByName(string name)
-        {
-            var dataSet = hotelRepository.GetAllHotels();
-            var result = await dataSet.ApplyFilterByName(name)
-                                      .Include(x => x.Address)
-                                      .Include(x => x.Urls)
-                                      .Include(x => x.Rooms).ThenInclude(x => x.RoomFacilities).ThenInclude(x => x.Facility)
-                                      .Include(x => x.Rooms).ThenInclude(x => x.RoomServices).ThenInclude(x => x.Service)
-                                      .ToListAsync();
-            if (result.Any())
-            {
-                return mapper.Map<IEnumerable<HotelModel>>(result);
             }
             return default;
         }

@@ -1,4 +1,5 @@
 ﻿using HotelBooking.Common.Base;
+using HotelBooking.Common.Enums;
 using HotelBooking.Data.DTOs.Booking;
 using HotelBooking.Data.DTOs.Hotel;
 using HotelBooking.Data.ViewModel;
@@ -139,42 +140,12 @@ namespace HotelBooking.API.Controllers
             });
         }
 
-        [HttpPost("fiters-hotel")]
-        public async Task<IActionResult> FilterHotel(FilterHotelRequest filter)
+        [HttpGet("fiters-hotel")]
+        public async Task<IActionResult> FilterHotel(string name, DateTime? from, DateTime? to, string city, RoomType? roomType)
         {
-
-            var result = await hotelService.GetHotelByAddressTypeRoomDuration(filter);
-            if (result.Any())
-            {
-                return StatusCode(StatusCodes.Status200OK, new ResponseModel
-                {
-                    StatusCode = HttpStatusCode.OK,
-                    Data = new
-                    {
-                        hotel = result
-                    },
-                    IsSuccess = true
-
-                });
-            }
-            return StatusCode(StatusCodes.Status404NotFound, new ResponseModel
-            {
-                StatusCode = HttpStatusCode.NotFound,
-                IsSuccess = false
-            });
-        }
-
-        [HttpGet("get-hotel-by-name")]
-        public async Task<IActionResult> GetHotelByNameAsync(string name)
-        {
-            if (string.IsNullOrEmpty(name))
-            {
-                var allHotels = await hotelService.GetAllHotel();
-                return Ok(allHotels);
-            }
-            var result = await hotelService.GetHotelByName(name);
+            var result = await hotelService.SearchHotel(name, from, to, city, roomType);
             return result != null ?
-                 StatusCode(StatusCodes.Status200OK, new ResponseModel { StatusCode = HttpStatusCode.OK, IsSuccess = true, Data = new { data = result, } })
+                 StatusCode(StatusCodes.Status200OK, new ResponseModel { StatusCode = HttpStatusCode.OK, IsSuccess = true, Data = result})
                 : StatusCode(StatusCodes.Status404NotFound, new ResponseModel { StatusCode = HttpStatusCode.NotFound, IsSuccess = false });
         }
 

@@ -1,5 +1,7 @@
 ﻿using HotelBooking.Common.Enums;
 using HotelBooking.Model.Entities;
+using FuzzySharp;
+using Microsoft.EntityFrameworkCore;
 
 namespace HotelBooking.Data.Helpers
 {
@@ -9,18 +11,12 @@ namespace HotelBooking.Data.Helpers
             this IQueryable<Hotel> hotelQuery,
             string city)
 
-        => hotelQuery.Where(x => x.Address.City.Equals(city) && x.IsDeleted == false);
+        => string.IsNullOrEmpty(city) ? hotelQuery : hotelQuery.Where(x => x.Address.City.Equals(city));
 
         public static IQueryable<Hotel> ApplyFilterByRoomType(
             this IQueryable<Hotel> hotelQuery,
-            RoomType roomType)
-        => hotelQuery.Where(x => x.Rooms.Any(x => x.RoomType.Equals(roomType)) == x.IsDeleted == false);
-
-        public static IQueryable<Hotel> ApplyFilterByName(
-            this IQueryable<Hotel> hotelQuery,
-            string name)
-        => hotelQuery.Where(x => x.HotelName.ToLower().Contains(name.ToLower()) && x.IsDeleted == false);
-
+            RoomType? roomType)
+        => roomType is not null ?  hotelQuery.Where(x => x.Rooms.Any(x => x.RoomType.Equals(roomType))) : hotelQuery;
 
     }
 }
