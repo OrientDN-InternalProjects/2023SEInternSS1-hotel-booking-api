@@ -1,4 +1,5 @@
-﻿using HotelBooking.Common.Models;
+﻿using HotelBooking.Common.Enums;
+using HotelBooking.Common.Models;
 using HotelBooking.Data.DTOs.Booking;
 using HotelBooking.Data.DTOs.Hotel;
 using HotelBooking.Data.ViewModel;
@@ -13,7 +14,7 @@ namespace HotelBooking.Service.IServices
         Task<bool> UpdateHotel(HotelRequest model, Guid id);
         Task<bool> DeleteHotel(Guid id);
 
-        Task<IEnumerable<HotelModel>> GetHotelByAddressTypeRoomDuration(FilterHotelRequest model);
+        Task<IEnumerable<HotelModel>> SearchHotel(string name, DateTime? from, DateTime? to, string city, RoomType? roomType);
         Task<IEnumerable<RoomVM>> GetAllRoomAvailable(Guid idHotel, DurationVM duration);
         Task<Guid> AddRoomAsync(RoomRequest model);
         Task<bool> UpdateRoomEquipment(EquipRoomRequest model);
@@ -34,7 +35,6 @@ namespace HotelBooking.Service.IServices
 
         Task<bool> AddServiceAndFacilityToRoomAsync(EquipRoomRequest model);
         Task<HotelModel> GetHotelByIdAsync(Guid id);
-        Task<IEnumerable<HotelModel>> GetHotelByName(string name);
         Task<RoomVM> GetRoomByIdAsync(Guid id);
     }
 }
