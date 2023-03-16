@@ -129,6 +129,7 @@ builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddScoped<IBookedRoom, IBookedRoomRepository>();
 builder.Services.AddScoped<ICheckDurationValidationService, CheckDurationValidationService>();
+builder.Services.AddScoped<IRoomPicture, RoomPicture>();
 
 var connectionString = builder.Configuration.GetConnectionString("Default");
 builder.Services.AddDbContext<BookingDbContext>(options =>

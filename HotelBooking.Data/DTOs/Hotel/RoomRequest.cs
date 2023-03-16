@@ -1,4 +1,5 @@
 ﻿using HotelBooking.Common.Enums;
+using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
 
 namespace HotelBooking.Data.DTOs.Hotel
@@ -10,5 +11,6 @@ namespace HotelBooking.Data.DTOs.Hotel
         public string HotelId { get; set; }
         public PriceRequest Price { get; set; }
         public string Description { get; set; }
+        public IEnumerable<IFormFile> Images { get; set; }
     }
 }

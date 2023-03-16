@@ -35,6 +35,9 @@ namespace HotelBooking.Data.Migrations
                     FullName = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    RefreshToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TokenCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    TokenExpires = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -53,6 +56,22 @@ namespace HotelBooking.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BlackLists",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Token = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BlackLists", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -115,8 +134,8 @@ namespace HotelBooking.Data.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Amount = table.Column<double>(type: "float", nullable: false),
                     PaymentStatus = table.Column<bool>(type: "bit", nullable: true),
-                    From = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    To = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    From = table.Column<DateTime>(type: "Date", nullable: false),
+                    To = table.Column<DateTime>(type: "Date", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -258,7 +277,7 @@ namespace HotelBooking.Data.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     HotelName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     Rating = table.Column<double>(type: "float", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AddressId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -304,7 +323,7 @@ namespace HotelBooking.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     RoomType = table.Column<int>(type: "int", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     HotelId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     BookingId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     PriceId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -394,8 +413,8 @@ namespace HotelBooking.Data.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     RoomId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     BookingId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    From = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    To = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    From = table.Column<DateTime>(type: "Date", nullable: false),
+                    To = table.Column<DateTime>(type: "Date", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -411,6 +430,29 @@ namespace HotelBooking.Data.Migrations
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_FHB_BookedRoom_FHB_Room_RoomId",
+                        column: x => x.RoomId,
+                        principalTable: "FHB_Room",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FHB_RoomImage",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ImageUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    RoomId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FHB_RoomImage", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_FHB_RoomImage_FHB_Room_RoomId",
                         column: x => x.RoomId,
                         principalTable: "FHB_Room",
                         principalColumn: "Id");
@@ -508,7 +550,14 @@ namespace HotelBooking.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_FHB_Room_PriceId",
                 table: "FHB_Room",
-                column: "PriceId");
+                column: "PriceId",
+                unique: true,
+                filter: "[PriceId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FHB_RoomImage_RoomId",
+                table: "FHB_RoomImage",
+                column: "RoomId");
         }
 
         /// <inheritdoc />
@@ -530,6 +579,9 @@ namespace HotelBooking.Data.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "BlackLists");
+
+            migrationBuilder.DropTable(
                 name: "FBH_Room_Facility");
 
             migrationBuilder.DropTable(
@@ -540,6 +592,9 @@ namespace HotelBooking.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "FHB_Image");
+
+            migrationBuilder.DropTable(
+                name: "FHB_RoomImage");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
