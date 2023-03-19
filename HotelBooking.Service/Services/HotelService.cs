@@ -7,7 +7,6 @@ using HotelBooking.Data.DTOs.Hotel;
 using HotelBooking.Data.Helpers;
 using HotelBooking.Data.Infrastructure;
 using HotelBooking.Data.Interfaces;
-using HotelBooking.Data.Repositories;
 using HotelBooking.Data.ViewModel;
 using HotelBooking.Model.Entities;
 using HotelBooking.Service.IServices;
@@ -20,6 +19,7 @@ namespace HotelBooking.Service.Services
         private readonly IHotelRepository hotelRepository;
         private readonly IAddressRepository addressRepository;
         private readonly IPictureRepository pictureRepository;
+        private readonly IRoomPicture roomPicture;
         private readonly IPictureService pictureService;
         private readonly ICheckDurationValidationService checkDurationValidationService;
 
@@ -37,7 +37,8 @@ namespace HotelBooking.Service.Services
             IPriceQuotationRepository priceQuotationRepository, IServiceHotelRepository serviceHotelRepository,
             IFacilityRepository facilityRepository, IRoomRepository roomRepository,
             IRoomService roomServiceRepository, IRoomFacility roomFacilityRepository,
-            IMapper mapper, IUnitOfWork unitOfWork, ICheckDurationValidationService checkDurationValidationService)
+            IMapper mapper, IUnitOfWork unitOfWork, ICheckDurationValidationService checkDurationValidationService,
+            IRoomPicture roomPicture)
         {
             this.hotelRepository = hotelRepository;
             this.addressRepository = addressRepository;
@@ -52,6 +53,7 @@ namespace HotelBooking.Service.Services
             this.roomFacilityRepository = roomFacilityRepository;
             this.roomServiceRepository = roomServiceRepository;
             this.checkDurationValidationService = checkDurationValidationService;
+            this.roomPicture = roomPicture;
         }
 
         public async Task<Guid> AddHotelAsync(HotelRequest model)
@@ -193,6 +195,22 @@ namespace HotelBooking.Service.Services
             var room = mapper.Map<Room>(model);
             room.CreatedDate = DateTime.Now;
             roomRepository.CreateAsync(room);
+
+            if (model.Images != null)
+            {
+                foreach (var i in model.Images)
+                {
+                    var url = await pictureService.UploadImageAsync(i);
+                    var image = new RoomImage
+                    {
+                        ImageUrl = url,
+                        Description = "Lorem ipsum",
+                        CreatedDate = DateTime.Now,
+                        Room = room,
+                    };
+                    roomPicture.CreateRoomImage(image);
+                }
+            }
             await unitOfWork.SaveAsync();
             return room.Id;
         }
@@ -303,7 +321,7 @@ namespace HotelBooking.Service.Services
 
         public async Task<bool> UpdateExtraService(ServiceHotelModel model)
         {
-            if(model.Id == null) return false;
+            if (model.Id == null) return false;
             var service = await serviceHotelRepository.GetByIdAsync(model.Id);
             if (service == null) return false;
             service.ServicePrice = model.ServicePrice;
@@ -413,7 +431,7 @@ namespace HotelBooking.Service.Services
 
         public async Task<IEnumerable<HotelModel>> SearchHotel(string name, DateTime? from, DateTime? to, string city, RoomType? roomType)
         {
-           
+
             var dataSet = hotelRepository.GetAllHotels();
             var result = await dataSet.ApplyFilterByAddress(city)
                                       .ApplyFilterByRoomType(roomType)
@@ -438,9 +456,9 @@ namespace HotelBooking.Service.Services
                 hotels = result;
             }
 
-            if (from == null || to  == null) return mapper.Map<IEnumerable<HotelModel>>(hotels);
+            if (from == null || to == null) return mapper.Map<IEnumerable<HotelModel>>(hotels);
             var returnHotels = new List<Hotel>();
-            var newDuration = new DurationVM { From = (DateTime) from, To = (DateTime) to };
+            var newDuration = new DurationVM { From = (DateTime)from, To = (DateTime)to };
             foreach (var hotel in hotels)
             {
                 var rooms = await roomRepository.GetByCondition(x => x.HotelId.Equals(hotel.Id) && x.RoomType == roomType).ToListAsync();
@@ -465,6 +483,8 @@ namespace HotelBooking.Service.Services
                                       .Include(x => x.Urls)
                                       .Include(x => x.Rooms).ThenInclude(x => x.RoomFacilities).ThenInclude(x => x.Facility)
                                       .Include(x => x.Rooms).ThenInclude(x => x.RoomServices).ThenInclude(x => x.Service)
+                                      .Include(x => x.Rooms).ThenInclude(x => x.Price)
+                                      .Include(x => x.Rooms).ThenInclude(x => x.Urls)
                                       .FirstOrDefaultAsync();
             if (result != null)
             {
@@ -501,5 +521,5 @@ namespace HotelBooking.Service.Services
     }
 
 
-}  
+}
 

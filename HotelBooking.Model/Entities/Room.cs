@@ -9,7 +9,7 @@ namespace HotelBooking.Model.Entities
     public class Room : BaseEntity
     {
         public RoomType? RoomType { get; set; }
-        [StringLength(500)]
+   
         public string Description { get; set; }
         public Guid? HotelId { get; set; }
         [ForeignKey("HotelId")]
@@ -23,5 +23,6 @@ namespace HotelBooking.Model.Entities
         public virtual ICollection<RoomService> RoomServices { get; set; }
         public virtual ICollection<RoomFacility> RoomFacilities { get; set; }
         public virtual ICollection<BookedRoom> BookedRooms { get; set;}
+        public virtual ICollection<RoomImage> Urls { get; set; }
     }
 }

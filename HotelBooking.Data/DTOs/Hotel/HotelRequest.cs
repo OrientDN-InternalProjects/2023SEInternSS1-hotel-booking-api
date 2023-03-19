@@ -8,7 +8,6 @@ namespace HotelBooking.Data.DTOs.Hotel
         [StringLength(100)]
         public string HotelName { get; set; }
         public double? Rating { get; set; }
-        [StringLength(250)]
         public string Description { get; set; }
         public AddressModel Address { get; set; }
         public IEnumerable<IFormFile> Images { get; set; }

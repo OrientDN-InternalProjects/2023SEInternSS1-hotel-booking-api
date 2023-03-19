@@ -315,7 +315,7 @@ namespace HotelBooking.API.Controllers
         {
             var result = await hotelService.GetHotelByIdAsync(id);
             return result != null ?
-                StatusCode(StatusCodes.Status200OK, new ResponseModel { StatusCode = HttpStatusCode.OK, IsSuccess = true, Data = new { data = result, } })
+                StatusCode(StatusCodes.Status200OK, new ResponseModel { StatusCode = HttpStatusCode.OK, IsSuccess = true, Data = result })
                 : StatusCode(StatusCodes.Status404NotFound, new ResponseModel { StatusCode = HttpStatusCode.NotFound, IsSuccess = false });
         }
 
