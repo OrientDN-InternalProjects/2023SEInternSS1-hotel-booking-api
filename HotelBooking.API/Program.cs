@@ -159,3 +159,5 @@ app.MapControllers();
 app.InitDb();
 
 app.Run();
+
+public partial class Program { }
