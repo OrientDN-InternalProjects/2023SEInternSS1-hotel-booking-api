@@ -21,5 +21,6 @@ namespace HotelBooking.Data.DTOs
         public string checksum { get; set; }
         public string pmcid { get; set; }
         public string status { get; set; }
+        public string id { get; set; }
     }
 }

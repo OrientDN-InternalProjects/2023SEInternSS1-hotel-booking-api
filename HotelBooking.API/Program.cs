@@ -1,3 +1,4 @@
+using HotelBooking.Common.Models;
 using HotelBooking.Data;
 using HotelBooking.Data.DataSeeder;
 using HotelBooking.Data.Extensions;
@@ -20,6 +21,7 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 var mailKitOptions = builder.Configuration.GetSection("MailSettings").Get<NETCore.MailKit.Infrastructure.Internal.MailKitOptions>();
+builder.Services.Configure<ZaloOptions>(builder.Configuration.GetSection("Zalopay"));
 // Add services to the container.
 
 builder.Services.AddControllers();

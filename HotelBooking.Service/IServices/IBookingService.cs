@@ -13,5 +13,6 @@ namespace HotelBooking.Service.IServices
         Task<BookingResponse> GetBookingById(Guid id);
         Task<IEnumerable<BookingResponse>> GetAllBookingsByUser(string email);
         Task<PagedList<BookingResponse>> GetBookingPagedList(PagedListRequest request);
+        Task<bool> UpdatePaymentStatus(Guid id);
     }
 }
