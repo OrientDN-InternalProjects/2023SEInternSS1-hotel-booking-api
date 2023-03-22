@@ -195,6 +195,15 @@ namespace HotelBooking.Service.Services
             return bookings;
         }
 
+        public async Task<bool> UpdatePaymentStatus(Guid id)
+        {
+            var booking = await bookingRepository.GetByIdAsync(id).FirstOrDefaultAsync();
+            if (booking == null) return false;
+            booking.PaymentStatus = true;
+            await unitOfWork.SaveAsync();
+            return true;
+        }
+
         private double CalculateFee(IEnumerable<Guid> roomIds)
         {
             double sum = 0;
@@ -208,5 +217,7 @@ namespace HotelBooking.Service.Services
 
             return sum;
         }
+
+        
     }
 }
