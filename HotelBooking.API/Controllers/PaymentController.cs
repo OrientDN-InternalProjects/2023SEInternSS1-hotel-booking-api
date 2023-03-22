@@ -1,6 +1,10 @@
-﻿using HotelBooking.Data.Crypto;
+﻿using HotelBooking.Common.Models;
+using HotelBooking.Data.Crypto;
 using HotelBooking.Data.DTOs;
+using HotelBooking.Data.Extensions;
+using HotelBooking.Service.IServices;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
 namespace HotelBooking.API.Controllers
@@ -9,34 +13,40 @@ namespace HotelBooking.API.Controllers
     [ApiController]
     public class PaymentController : ControllerBase
     {
-        public PaymentController()
+        private readonly IBookingService bookingService;
+        private readonly ILogger<PaymentController> logger;
+        private readonly IOptions<ZaloOptions> zaloOptions;
+        private readonly ICurrentUser currentUser;
+        public PaymentController(IBookingService bookingService, ILogger<PaymentController> logger, 
+            ICurrentUser currentUser, IOptions<ZaloOptions> zaloOptions)
         {
-
+            this.bookingService = bookingService;
+            this.logger = logger;
+            this.currentUser = currentUser;
+            this.zaloOptions = zaloOptions;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Payment()
+        public async Task<IActionResult> Payment(Guid id)
         {
-            string appid = "2554";
-            string key1 = "sdngKKJmqEMzvh5QQcdD2A9XBSKUNaYn";
-            string createOrderUrl = "https://sandbox.zalopay.com.vn/v001/tpe/createorder";
+            var booking = await bookingService.GetBookingById(id);
+            var appid = "2554";
+            var key1 = zaloOptions.Value.Key1;
+            var createOrderUrl = "https://sandbox.zalopay.com.vn/v001/tpe/createorder";
             var transid = Guid.NewGuid().ToString();
             var embeddata = new
             {
-                merchantinfo = "embeddata123",
-                redirecturl = "https://localhost:7137/api/Payment/return-url"
+                merchantinfo = "haiyencute123@",
+                redirecturl = $"https://localhost:7137/api/Payment/return-url?id={id}"
             };
-            var items = new[]{
-                new { itemid = "knb", itemname = "kim nguyen bao", itemprice = 198400, itemquantity = 1 }
-                };
-
+            var items = new[]{new { id = booking.Id.ToString()}};
             var param = new Dictionary<string, string>();
 
             param.Add("appid", appid);
-            param.Add("appuser", "demo");
+            param.Add("appuser", currentUser.UserEmail);
             param.Add("apptime", Utils.GetTimeStamp().ToString());
-            param.Add("amount", "10000");
-            param.Add("apptransid", DateTime.Now.ToString("yyMMdd") + "_" + transid); // mã giao dich có định dạng yyMMdd_xxxx
+            param.Add("amount", booking.Amount.ToString());
+            param.Add("apptransid", DateTime.Now.ToString("yyMMdd") + "_" + transid);
             param.Add("embeddata", JsonConvert.SerializeObject(embeddata));
             param.Add("item", JsonConvert.SerializeObject(items));
             param.Add("description", "ZaloPay demo");
@@ -56,50 +66,23 @@ namespace HotelBooking.API.Controllers
         }
 
         [HttpGet("return-url")]
-        public IActionResult PostZaloPay([FromQuery] PaymentRequest data)
+        public async Task<IActionResult> ReturnFromZaloPay([FromQuery] PaymentRequest data)
         {
-            string key2 = "trMrHtvjo6myautxDUiAcYsVtaeQ8nhf";
+            string key2 = zaloOptions.Value.Key2;
             var result = new Dictionary<string, object>();
-
-            try
+            var checksumData = data.appid + "|" + data.apptransid + "|" + data.pmcid + "|" +
+                data.bankcode + "|" + data.amount + "|" + data.discountamount + "|" + data.status;
+            var checksum = HmacHelper.Compute(ZaloPayHMAC.HMACSHA256, key2, checksumData);
+            if (!checksum.Equals(data.checksum))
             {
-                //var checksumData = data.appid + "|" + data.apptransid + "|" + data["pmcid"] + "|" +
-                //data["bankcode"] + "|" + data["amount"] + "|" + data["discountamount"] + "|" + data["status"];
-                //var checksum = HmacHelper.Compute(ZaloPayHMAC.HMACSHA256, key2, checksumData);
-
-                //var dataStr = Convert.ToString(cbdata["data"]);
-                //var reqMac = Convert.ToString(cbdata["mac"]);
-
-                //var mac = HmacHelper.Compute(ZaloPayHMAC.HMACSHA256, key2, dataStr);
-
-                //Console.WriteLine("mac = {0}", mac);
-
-                //// kiểm tra callback hợp lệ (đến từ ZaloPay server)
-                //if (!reqMac.Equals(mac))
-                //{
-                //    // callback không hợp lệ
-                //    result["returncode"] = -1;
-                //    result["returnmessage"] = "mac not equal";
-                //}
-                //else
-                //{
-                //    // thanh toán thành công
-                //    // merchant cập nhật trạng thái cho đơn hàng
-                //    var dataJson = JsonConvert.DeserializeObject<Dictionary<string, object>>(dataStr);
-                //    Console.WriteLine("update order's status = success where apptransid = {0}", dataJson["apptransid"]);
-
-                //    result["returncode"] = 1;
-                //    result["returnmessage"] = "success";
-                //}
+                return BadRequest("Request is not valid");
             }
-            catch (Exception ex)
+            else
             {
-                result["returncode"] = 0; // ZaloPay server sẽ callback lại (tối đa 3 lần)
-                result["returnmessage"] = ex.Message;
+                if (int.Parse(data.status) != 1) return BadRequest("Payment process failed!");
+                await bookingService.UpdatePaymentStatus(new Guid(data.id));
+                return Ok(data);
             }
-
-            // thông báo kết quả cho ZaloPay server
-            return Ok(result);
         }
     }
 }
