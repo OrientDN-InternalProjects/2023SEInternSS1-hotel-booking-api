@@ -146,7 +146,7 @@ namespace HotelBooking.API.Controllers
             var result = await hotelService.SearchHotel(name, from, to, city, roomType);
             return result != null ?
                  StatusCode(StatusCodes.Status200OK, new ResponseModel { StatusCode = HttpStatusCode.OK, IsSuccess = true, Data = result})
-                : StatusCode(StatusCodes.Status404NotFound, new ResponseModel { StatusCode = HttpStatusCode.NotFound, IsSuccess = false });
+                : StatusCode(StatusCodes.Status200OK, new ResponseModel { StatusCode = HttpStatusCode.NotFound, IsSuccess = false, Data = new List<HotelModel>()});
         }
 
         [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
