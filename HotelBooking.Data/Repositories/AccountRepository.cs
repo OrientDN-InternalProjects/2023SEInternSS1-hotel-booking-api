@@ -2,6 +2,7 @@
 using HotelBooking.Common.Constants;
 using HotelBooking.Data.DTOs.Account;
 using HotelBooking.Data.Extensions;
+using HotelBooking.Data.Infrastructure;
 using HotelBooking.Data.Interfaces;
 using HotelBooking.Model.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -23,10 +24,12 @@ namespace HotelBooking.Data.Repositories
         private readonly BookingDbContext context;
         private readonly IMailSender mailSender;
         private readonly ITokenManager tokenManager;
+        private readonly IUnitOfWork unitOfWork;
         public AccountRepository(UserManager<User> userManager,
             SignInManager<User> signInManager,
             IConfiguration configuration, BookingDbContext context,
-            IMailSender mailSender, ITokenManager tokenManager
+            IMailSender mailSender, ITokenManager tokenManager,
+            IUnitOfWork unitOfWork
             )
         {
             this.userManager = userManager;
@@ -35,6 +38,7 @@ namespace HotelBooking.Data.Repositories
             this.context = context;
             this.mailSender = mailSender;
             this.tokenManager = tokenManager;
+            this.unitOfWork = unitOfWork;
         }
 
         public async Task<ResponseModel> ChangePassword(string email, ChangePasswordRequest model)
@@ -134,7 +138,7 @@ namespace HotelBooking.Data.Repositories
             {
                 JwtSecurityToken jwtSecurityToken = await CreateJwtToken(existUser);
                 var refreshToken = GenerateRefreshToken();
-                SetRefreshToken(refreshToken, existUser);
+                await SetRefreshToken(refreshToken, existUser);
                 return new ResponseModel
                 {
                     StatusCode = HttpStatusCode.OK,
@@ -242,12 +246,12 @@ namespace HotelBooking.Data.Repositories
             return refreshToken;
         }
 
-        private async void SetRefreshToken(RefreshToken refreshToken, User existUser)
+        private async Task SetRefreshToken(RefreshToken refreshToken, User existUser)
         {
             existUser.RefreshToken = refreshToken.Token;
             existUser.TokenCreated = refreshToken.Created;
             existUser.TokenExpires = refreshToken.Expires;
-            await context.SaveChangesAsync();
+            await unitOfWork.SaveAsync();
         }
 
         private async Task<JwtSecurityToken> CreateJwtToken(User user)

@@ -43,8 +43,6 @@ namespace HotelBooking.API.Controllers
                 return BadRequest("Invalid model object");
             }
             var result = await accountRepository.LoginAsync(model);
-            if ((int)result.StatusCode == 404) return NotFound(result);
-            if ((int)result.StatusCode == 400) return BadRequest(result);
             return Ok(result);
         }
 

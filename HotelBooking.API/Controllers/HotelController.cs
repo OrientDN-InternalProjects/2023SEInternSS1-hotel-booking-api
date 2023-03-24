@@ -333,7 +333,8 @@ namespace HotelBooking.API.Controllers
         public async Task<IActionResult> GetAllHotelPagedList([FromQuery] PagedListRequest request)
         {
             var hotels = await hotelService.GetHotelPagedList(request);
-            return Ok(hotels);
+            return Ok(new ResponseModel
+            { StatusCode = HttpStatusCode.OK, IsSuccess = true, Data = new { items = hotels, totalPage = hotels.TotalPages } });
         }
 
     }
