@@ -42,9 +42,7 @@ namespace HotelBooking.API.Controllers
                 model.Email = currentUser.UserEmail;
             }
             var res = await bookingService.AddBookingAsync(model);
-
-            return res.IsSuccess == true ?
-                StatusCode(StatusCodes.Status201Created, res) : StatusCode(StatusCodes.Status400BadRequest, res);
+            return Ok(res);
         }
 
         [HttpPost("filter-room-by-duration")]
