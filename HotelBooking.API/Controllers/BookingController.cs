@@ -164,5 +164,13 @@ namespace HotelBooking.API.Controllers
             var bookings = await bookingService.GetBookingPagedList(request);
             return Ok(bookings);
         }
+
+        [HttpPost("calculate-fee")]
+        public async Task<IActionResult> Calculate(IEnumerable<Guid> roomIds)
+        {
+            var total = await bookingService.CalculateFee(roomIds);
+            return Ok(total);
+        }
+
     }
 }

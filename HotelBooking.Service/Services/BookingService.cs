@@ -58,7 +58,7 @@ namespace HotelBooking.Service.Services
                 From = model.Duration.From,
                 To = model.Duration.To,
                 Email = model.Email,
-                Amount = CalculateFee(model.RoomIds)
+                Amount = await CalculateFee(model.RoomIds)
             };
             if (model.UserId != null)
             {
@@ -125,7 +125,7 @@ namespace HotelBooking.Service.Services
             var res = await bookingRepository.GetByIdAsync(Id).FirstOrDefaultAsync();
             if (res == null) return false;
             var booking = mapper.Map<Booking>(res);
-            booking.Amount = CalculateFee(model.RoomIds);
+            booking.Amount = await CalculateFee(model.RoomIds);
             booking.From = model.Duration.From;
             booking.To = model.Duration.To;
             booking.UpdatedDate = DateTime.Now;
@@ -204,14 +204,15 @@ namespace HotelBooking.Service.Services
             return true;
         }
 
-        private double CalculateFee(IEnumerable<Guid> roomIds)
+        public async Task<double> CalculateFee(IEnumerable<Guid> roomIds)
         {
             double sum = 0;
+            if (!roomIds.Any()) { return sum; }
 
             foreach (var roomId in roomIds)
             {
                 var res = roomServiceRepository.GetByCondition(x => x.IsDeleted == false && x.RoomId == roomId).Select(x => x.Service).ToList().Sum(x => x.ServicePrice);
-                var room_price = roomRepository.GetByCondition(x => x.IsDeleted == false && x.Id == roomId).Select(x => x.Price.Price).FirstOrDefault();
+                var room_price = await roomRepository.GetByCondition(x => x.IsDeleted == false && x.Id == roomId).Select(x => x.Price.Price).FirstOrDefaultAsync();
                 sum += res + room_price;
             }
 

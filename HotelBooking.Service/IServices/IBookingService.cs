@@ -14,5 +14,6 @@ namespace HotelBooking.Service.IServices
         Task<IEnumerable<BookingResponse>> GetAllBookingsByUser(string email);
         Task<PagedList<BookingResponse>> GetBookingPagedList(PagedListRequest request);
         Task<bool> UpdatePaymentStatus(Guid id);
+        public Task<double> CalculateFee(IEnumerable<Guid> roomIds);
     }
 }
