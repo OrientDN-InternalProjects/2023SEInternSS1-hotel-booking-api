@@ -42,9 +42,7 @@ namespace HotelBooking.API.Controllers
                 model.Email = currentUser.UserEmail;
             }
             var res = await bookingService.AddBookingAsync(model);
-
-            return res.IsSuccess == true ?
-                StatusCode(StatusCodes.Status201Created, res) : StatusCode(StatusCodes.Status400BadRequest, res);
+            return Ok(res);
         }
 
         [HttpPost("filter-room-by-duration")]
@@ -166,5 +164,13 @@ namespace HotelBooking.API.Controllers
             var bookings = await bookingService.GetBookingPagedList(request);
             return Ok(bookings);
         }
+
+        [HttpPost("calculate-fee")]
+        public async Task<IActionResult> Calculate(IEnumerable<Guid> roomIds)
+        {
+            var total = await bookingService.CalculateFee(roomIds);
+            return Ok(total);
+        }
+
     }
 }

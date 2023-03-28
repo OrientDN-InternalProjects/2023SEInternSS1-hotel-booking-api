@@ -81,7 +81,8 @@ namespace HotelBooking.API.Controllers
             {
                 if (int.Parse(data.status) != 1) return BadRequest("Payment process failed!");
                 await bookingService.UpdatePaymentStatus(new Guid(data.id));
-                return Ok(data);
+                return(Redirect("http://localhost:3000/result"));
+                //return Ok(data);
             }
         }
     }

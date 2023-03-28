@@ -170,6 +170,8 @@ namespace HotelBooking.Service.Services
             var rooms = await roomRepository.GetByCondition(x => x.HotelId.Equals(idHotel) && x.IsDeleted == false)
                                             .Include(x => x.RoomFacilities).ThenInclude(x => x.Facility)
                                             .Include(x => x.RoomServices).ThenInclude(x => x.Service)
+                                            .Include(x => x.Price)
+                                            .Include(x => x.Urls)
                                             .ToListAsync();
             if (rooms.Any())
             {
